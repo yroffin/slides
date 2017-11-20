@@ -7,14 +7,22 @@
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<artifactId>slides-server</artifactId>
-	<name>Slides server (spring-boot)</name>
+	<artifactId>slides-swagger</artifactId>
+	<name>Swagger libraries</name>
 
 	<dependencies>
-		<!-- internal dependencies -->
+		<!-- swagger dependencies -->
 		<dependency>
-			<groupId>org.yroffin.slides</groupId>
-			<artifactId>slides-swagger</artifactId>
+		    <groupId>io.swagger</groupId>
+		    <artifactId>swagger-core</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>io.swagger</groupId>
+		    <artifactId>swagger-annotations</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>io.swagger</groupId>
+		    <artifactId>swagger-jaxrs</artifactId>
 		</dependency>
 		<!-- external dependencies -->
 		<dependency>
@@ -93,24 +101,4 @@
 		</dependency>
 	</dependencies>
 
-	<properties>
-		<start-class>org.yroffin.slides.SlidesServer</start-class>
-	</properties>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring-boot.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 </project>
