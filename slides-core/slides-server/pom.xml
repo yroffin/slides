@@ -14,9 +14,38 @@
 		<!-- internal dependencies -->
 		<dependency>
 			<groupId>org.yroffin.slides</groupId>
+			<artifactId>slides-model</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.yroffin.slides</groupId>
 			<artifactId>slides-swagger</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.yroffin.slides</groupId>
+			<artifactId>slides-rest-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.yroffin.slides</groupId>
+			<artifactId>slides-api</artifactId>
+		</dependency>
+		<!-- pac4j -->
+		<dependency>
+			<groupId>org.pac4j</groupId>
+			<artifactId>pac4j-oauth</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.pac4j</groupId>
+			<artifactId>spark-pac4j</artifactId>
+		</dependency>
 		<!-- external dependencies -->
+		<dependency>
+			<groupId>com.atlassian.commonmark</groupId>
+			<artifactId>commonmark</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.commonmark</groupId>
+			<artifactId>commonmark-ext-gfm-tables</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>

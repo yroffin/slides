@@ -29,7 +29,7 @@
 			<PatternLayout pattern="%d{DEFAULT} %msg%n" />
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
-		<Console name="Console" target="SYSTEM_OUT">
+		<Console name="Console" target="SYSTEM_OUT" ignoreExceptions="false">
 			<PatternLayout pattern="%d{DEFAULT} [%t] %-5level %l - %msg%n" />
 		</Console>
 	</Appenders>
@@ -54,7 +54,7 @@
 		<Logger name="org.slides.core.access" level="info" additivity="false">
 			<AppenderRef ref="RollingAccessFile" />
 		</Logger>
-		<Root level="warn">
+		<Root level="debug">
 			<AppenderRef ref="Console" level="info" />
 			<AppenderRef ref="RollingFile" level="warn" />
 		</Root>
