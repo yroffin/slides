@@ -291,6 +291,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 		return new Route() {
 			@Override
 			public Object handle(Request request, Response response) {
+				response.type("application/json");
 				return doFindAll(request, response);
 			}
 		};
@@ -300,6 +301,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 		return new Route() {
 			@Override
 			public Object handle(Request request, Response response) {
+				response.type("application/json");
 				return doGetById(request, ID, response);
 			}
 		};
@@ -309,6 +311,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 		return new Route() {
 			@Override
 			public Object handle(Request request, Response response) throws InterruptedException {
+				response.type("application/json");
 				return doCreate(request, response);
 			}
 		};
@@ -318,6 +321,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 		return new Route() {
 			@Override
 			public Object handle(Request request, Response response) throws TechnicalNotFoundException {
+				response.type("application/json");
 				return doTask(request, ID, TASK, response);
 			}
 		};
@@ -327,6 +331,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 		return new Route() {
 			@Override
 			public Object handle(Request request, Response response) {
+				response.type("application/json");
 				return doUpdate(request, ID, response);
 			}
 		};
@@ -336,6 +341,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 		return new Route() {
 			@Override
 			public Object handle(Request request, Response response) {
+				response.type("application/json");
 				return doDelete(request, ID, response);
 			}
 		};
@@ -408,6 +414,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 			rests.add(rest);
 			triggerAfterRest(TRIGGER_METHOD.ALL, request, response, rest);
 		}
+		response.type("application/json");
 		return writeValueAsString(rests);
 	}
 
@@ -425,6 +432,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 			BEAN bean = doGetByIdBean(request.params(id));
 			REST rest = mapBeanToRest(bean);
 			triggerAfterRest(TRIGGER_METHOD.GET, request, response, rest);
+			response.type("application/json");
 			return writeValueAsString(rest);
 		} catch (TechnicalNotFoundException e) {
 			response.status(404);
@@ -457,6 +465,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 		BEAN created = doCreateBean(mapRestToBean(rest));
 		REST result = mapBeanToRest(created);
 		triggerAfterRest(TRIGGER_METHOD.POST, request, response, result);
+		response.type("application/json");
 		return writeValueAsString(result);
 	}
 
@@ -486,6 +495,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 			BEAN updated = doUpdateRest(request.params(id), rest);
 			REST result = mapBeanToRest(updated);
 			triggerAfterRest(TRIGGER_METHOD.PUT, request, response, result);
+			response.type("application/json");
 			return writeValueAsString(result);
 		} catch (TechnicalNotFoundException e) {
 			response.status(404);
@@ -508,6 +518,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 			return "";
 		}
 		try {
+			response.type("application/json");
 			return writeValueAsString(doDelete(request.params(id)));
 		} catch (TechnicalNotFoundException e) {
 			response.status(404);
@@ -553,6 +564,7 @@ public abstract class ApiResources<REST extends GenericEntity, BEAN extends Gene
 	 */
 	public String doTask(Request request, String id, String task, Response response) throws TechnicalNotFoundException {
 		GenericMap body = null;
+		response.type("application/json");
 		if (request.contentType() != null && request.contentType().startsWith("multipart/form-data")) {
 			body = new GenericMap();
 			body.put("multipart/form-data", extractMultipart(request, response));

@@ -200,14 +200,15 @@ public class CoreServerDaemon {
 		/**
 		 * mount all standard resources
 		 */
-		mountAllResources("org.slides.core.resources.api");
+		mountAllResources("org.yroffin.slides.resources.api");
 
 		/**
 		 * Build swagger json description
 		 */
 		final String swaggerJson;
-		swaggerJson = SwaggerParser.getSwaggerJson("org.slides.core");
+		swaggerJson = SwaggerParser.getSwaggerJson("org.yroffin.slides");
 		spark.Spark.get("/api/swagger", (req, res) -> {
+			res.type("application/json");
 			return swaggerJson;
 		});
 
@@ -215,8 +216,8 @@ public class CoreServerDaemon {
 		 * swagger ui resources
 		 */
 		spark.Spark.get("/swagger-ui/*", (req, res) -> {
-			String resource = "public/swagger-ui" + req.uri().replace("/swagger-ui", "");
-			logger.info("uri: {}", resource);
+			String resource = "public/swagger-ui" + req.uri().replace("/swagger-ui/", "/");
+			logger.info("uri: {} => {}", req.uri(), resource);
 			InputStream is = this.getClass().getClassLoader().getResourceAsStream(resource);
 			if (is != null) {
 				return IOUtils.toByteArray(is);

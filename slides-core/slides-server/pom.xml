@@ -28,6 +28,11 @@
 			<groupId>org.yroffin.slides</groupId>
 			<artifactId>slides-api</artifactId>
 		</dependency>
+		<!-- hibernate-validator -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+		</dependency>
 		<!-- pac4j -->
 		<dependency>
 			<groupId>org.pac4j</groupId>

@@ -14,7 +14,8 @@ public class SlidesCoreCredentials extends Credentials {
 
 	@Override
 	public String toString() {
-		return "JarvisCoreCredentials [getClientName()=" + getClientName() + "]";
+		return "SlidesCoreCredentials [getClientName()=" + getClientName() + ", getUserProfile()=" + getUserProfile()
+				+ "]";
 	}
 
 	@Override

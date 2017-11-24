@@ -14,15 +14,15 @@
  *   limitations under the License.
  */
 
-package org.yroffin.slides.resources.api.process;
+package org.yroffin.slides.resources.api.folder;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slides.yroffin.model.slide.SlideBean;
-import org.slides.yroffin.model.slide.SlideRest;
+import org.slides.yroffin.model.folder.FolderBean;
+import org.slides.yroffin.model.folder.FolderRest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -36,13 +36,13 @@ import io.swagger.annotations.Api;
 /**
  * Block resource
  */
-@Api(value = "slide")
-@Path("/api/slides")
+@Api(value = "folder")
+@Path("/api/folders")
 @Produces("application/json")
 @Component
-@Declare(resource = "slides", summary = "Slides resource", rest = SlideRest.class)
-public class ApiSlideResources extends ApiResources<SlideRest, SlideBean> {
-	protected Logger logger = LoggerFactory.getLogger(ApiSlideResources.class);
+@Declare(resource = "folders", summary = "Folders resource", rest = FolderRest.class)
+public class ApiFolderResources extends ApiResources<FolderRest, FolderBean> {
+	protected Logger logger = LoggerFactory.getLogger(ApiFolderResources.class);
 
 	@Autowired
 	Environment env;
@@ -50,13 +50,13 @@ public class ApiSlideResources extends ApiResources<SlideRest, SlideBean> {
 	/**
 	 * constructor
 	 */
-	public ApiSlideResources() {
-		setRestClass(SlideRest.class);
-		setBeanClass(SlideBean.class);
+	public ApiFolderResources() {
+		setRestClass(FolderRest.class);
+		setBeanClass(FolderBean.class);
 	}
 
 	@Override
-	public GenericValue doRealTask(SlideBean bean, GenericMap args, String taskType) {
+	public GenericValue doRealTask(FolderBean bean, GenericMap args, String taskType) {
 		return null;
 	}
 }
