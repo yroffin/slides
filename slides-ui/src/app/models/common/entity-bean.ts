@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-import { EntityBean } from './entity-bean';
-import { SlideBean } from './slide-bean';
-
-export class FolderBean extends EntityBean {
-    name: string;
-    slides: Array<SlideBean>;
+ export class EntityBean {
+     id: string
 }

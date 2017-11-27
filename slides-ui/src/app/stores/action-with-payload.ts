@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { EntityBean } from './entity-bean';
-import { SlideBean } from './slide-bean';
+import { Action } from '@ngrx/store';
 
-export class FolderBean extends EntityBean {
-    name: string;
-    slides: Array<SlideBean>;
+export class ActionWithPayload<T> implements Action {
+  readonly type: string;
+  constructor(public payload: T) {
+    
+  }
 }

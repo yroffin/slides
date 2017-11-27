@@ -85,7 +85,9 @@ import { ProfileGuard } from './guards/profile.guard';
 /**
  * stores
  */
-import { FoldersStoreService } from './store/folders.store.service';
+import { FolderStoreService } from './stores/folder-store.service';
+import { SlideStoreService } from './stores/slide-store.service';
+import { SlideWalkerComponent } from './components/widget/slide-walker/slide-walker.component';
 
 /**
  * default route definition
@@ -98,7 +100,8 @@ const appRoutes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
+    SlideWalkerComponent
   ],
   imports: [
     BrowserModule,
@@ -160,15 +163,27 @@ const appRoutes: Routes = [
      * store
      */
     StoreModule.forRoot({
-      Broker: FoldersStoreService.reducer
+      slide: SlideStoreService.reducer,
+      folder: FolderStoreService.reducer
     })
   ],
   providers: [
       /**
        * guards
        */
-      ProfileGuard
+      ProfileGuard,
+      /**
+       * stores
+       */
+      FolderStoreService,
+      SlideStoreService
     ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  public static metareducer(state: any, action: any): any {
+    console.log('state', state);
+    console.log('action', action);
+    return state;
+  }
+}

@@ -9,6 +9,7 @@ describe('slides-ui App', () => {
 
   it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('Welcome to app!');
+    console.log(page.getParagraphText());
+    expect(page.getParagraphText()).toEqual('teszaet - titleeazzea - tesazzaet');
   });
 });
