@@ -52,23 +52,23 @@ export class AppComponent {
         'slides': [
           {
             'id': '1',
-            'title': 'title default',
-            'subtitle': 'subtitle default',
+            'title': 'titre 1',
+            'subtitle': 'subtitle 1',
             'body': 'data ... todo ...',
             slides: [
               {
                 'id': '1.1',
-                'title': 'title default',
-                'subtitle': 'subtitle default',
-                'body': 'data ... todo ...',
+                'title': 'title 1.a',
+                'subtitle': 'subtitle 1.a',
+                'body': 'data ... todo ... zaezeazazezae<p>qsdsqmdlksd</p>',
                 slides: [
                 ]
               },
               {
                 'id': '1.2',
-                'title': 'title default',
-                'subtitle': 'subtitle default',
-                'body': 'data ... todo ...',
+                'title': 'title 1.b',
+                'subtitle': 'subtitle 1.b',
+                'body': 'data ... xxx ...',
                 slides: [
                 ]
               }
@@ -76,23 +76,23 @@ export class AppComponent {
           },
           {
             'id': '2',
-            'title': 'title default',
+            'title': 'title 2',
             'subtitle': 'subtitle default',
             'body': 'data ... todo ...',
             slides: [
               {
                 'id': '2.1',
-                'title': 'title default',
-                'subtitle': 'subtitle default',
+                'title': 'title 2.a',
+                'subtitle': 'subtitle 2.a',
                 'body': 'data ... todo ...',
                 slides: [
                 ]
               },
               {
                 'id': '2.2',
-                'title': 'title default',
-                'subtitle': 'subtitle default',
-                'body': 'data ... todo ...',
+                'title': 'title 2.b',
+                'subtitle': 'subtitle 2.b',
+                'body': 'data ... ttttt ...',
                 slides: [
                 ]
               }

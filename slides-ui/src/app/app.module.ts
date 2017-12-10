@@ -88,6 +88,7 @@ import { ProfileGuard } from './guards/profile.guard';
 import { FolderStoreService } from './stores/folder-store.service';
 import { SlideStoreService } from './stores/slide-store.service';
 import { SlideWalkerComponent } from './components/widget/slide-walker/slide-walker.component';
+import { SlidePresenterComponent } from './components/widget/slide-presenter/slide-presenter.component';
 
 /**
  * default route definition
@@ -101,7 +102,8 @@ const appRoutes: Routes = [
   declarations: [
     AppComponent,
     HomeComponent,
-    SlideWalkerComponent
+    SlideWalkerComponent,
+    SlidePresenterComponent
   ],
   imports: [
     BrowserModule,

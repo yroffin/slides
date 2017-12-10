@@ -1,6 +1,4 @@
-<p>
-  slide-walker works!
-</p>
+<button mat-button (click)="viewFolder()">view</button>
 <p-treeTable [value]="items" selectionMode="single" [(selection)]="selectedSlides" (onNodeSelect)="selectSlide($event)">
   <p-header>Slides</p-header>
   <p-column field="id" header="id"></p-column>

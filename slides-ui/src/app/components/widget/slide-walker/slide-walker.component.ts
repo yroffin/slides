@@ -37,6 +37,7 @@ export class SlideWalkerComponent implements OnInit {
 
   private items: TreeNode[] = [];
   private selectedSlides: TreeNode[];
+  private selectedFolder: FolderBean;
 
   constructor(
     private folderStoreService: FolderStoreService,
@@ -50,6 +51,7 @@ export class SlideWalkerComponent implements OnInit {
     this.items = [];
     this.folderStream.subscribe(
       (folder: FolderBean) => {
+        this.selectedFolder = folder;
         let item: TreeNode = {
           data: {
             id: folder.id,
@@ -109,5 +111,13 @@ export class SlideWalkerComponent implements OnInit {
         event.node.data.slide
       ));
     }
+  }
+
+  /**
+   * open folder in view mode
+   */
+  public viewFolder(): void {
+    window.open("http://jarvis.acme.com:4200/api/reveal/folder/1", "_blank");
+    // window.open("/api/folder/"+this.selectedFolder.id, "_blank");
   }
 }

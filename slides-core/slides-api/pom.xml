@@ -20,6 +20,11 @@
 			<groupId>org.yroffin.slides</groupId>
 			<artifactId>slides-neo4j</artifactId>
 		</dependency>
+		<!-- velocity -->
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity-engine-core</artifactId>
+		</dependency>
 		<!-- external dependencies -->
 		<dependency>
 			<groupId>com.sparkjava</groupId>
