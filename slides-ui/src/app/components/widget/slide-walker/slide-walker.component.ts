@@ -22,9 +22,12 @@ import * as _ from 'lodash';
 
 import { TreeNode } from 'primeng/primeng';
 
+import { DataSlidesService } from '../../../services/data-slides.service';
 import { FolderStoreService } from '../../../stores/folder-store.service';
 import { SlideStoreService, SelectSlideAction } from '../../../stores/slide-store.service';
 import { FolderBean } from '../../../models/common/folder-bean';
+import { SlideBean } from '../../../models/common/slide-bean';
+import { LoggerService } from '../../../services/logger.service';
 
 @Component({
   selector: 'app-slide-walker',
@@ -41,12 +44,35 @@ export class SlideWalkerComponent implements OnInit {
 
   constructor(
     private folderStoreService: FolderStoreService,
-    private slideStoreService: SlideStoreService
+    private slideStoreService: SlideStoreService,
+    private dataSlidesService: DataSlidesService,
+    private logger: LoggerService
   ) {
     /**
      * find the folder store
      */
     this.folderStream = this.folderStoreService.select();
+
+    let all: SlideBean[]
+    dataSlidesService.GetAll()
+      .subscribe(
+      (data: SlideBean[]) => all = data,
+      error => this.logger.error("In loadResource", error),
+      () => {
+        let allSlides = {
+          elements: []
+        };
+        let that = this;
+        /**
+         * order by name then chunk it by piece of max
+         */
+        _.forEach(_.orderBy(all, ['name'], ['asc']), function (chunked) {
+          allSlides.elements.push({
+            id: chunked.id,
+            name: chunked.name
+          });
+        });
+      });
 
     this.items = [];
     this.folderStream.subscribe(

@@ -32,7 +32,7 @@ export interface AppState {
 }
 
 export interface FolderState {
-	folder: FolderBean;
+  folder: FolderBean;
 }
 
 /**
@@ -40,10 +40,10 @@ export interface FolderState {
  */
 export class SelectFolderAction implements ActionWithPayload<FolderBean> {
   readonly type = 'SelectFolderAction';
-  constructor(public payload: FolderBean) {}
+  constructor(public payload: FolderBean) { }
 }
 
-export type AllFolderActions = SelectFolderAction;  
+export type AllFolderActions = SelectFolderAction;
 
 /**
  * main store for this application
@@ -52,7 +52,7 @@ export type AllFolderActions = SelectFolderAction;
 export class FolderStoreService {
 
   public static getFolder: MemoizedSelector<object, FolderBean>;
-  
+
   /**
    * 
    * @param _store constructor
@@ -60,7 +60,7 @@ export class FolderStoreService {
   constructor(
     private _store: Store<FolderState>
   ) {
-    FolderStoreService.getFolder =  createSelector(createFeatureSelector<FolderState>('folder'), (state: FolderState) => state.folder); 
+    FolderStoreService.getFolder = createSelector(createFeatureSelector<FolderState>('folder'), (state: FolderState) => state.folder);
   }
 
   /**
@@ -69,7 +69,7 @@ export class FolderStoreService {
   public select(): Store<FolderBean> {
     return this._store.select(FolderStoreService.getFolder);
   }
-  
+
   /**
    * dispatch
    * @param action dispatch action
@@ -83,14 +83,14 @@ export class FolderStoreService {
    * @param state 
    * @param action 
    */
-  public static reducer(state: FolderState = {folder: new FolderBean()}, action: AllFolderActions): FolderState {
+  public static reducer(state: FolderState = { folder: new FolderBean() }, action: AllFolderActions): FolderState {
     switch (action.type) {
       /**
        * message incomming
        */
       case 'SelectFolderAction':
         {
-          return {folder: action.payload};
+          return { folder: action.payload };
         }
 
       default:

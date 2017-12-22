@@ -27,6 +27,14 @@ import { StoreModule } from '@ngrx/store';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/common/home/home.component';
 
+import { ConfigurationService } from './services/configuration.service';
+import { DataCoreService } from './services/data-core.service';
+import { DataSlidesService } from './services/data-slides.service';
+import { DataStoreService } from './services/data-store.service';
+import { SecurityService } from './services/security.service';
+import { WindowService } from './services/window.service';
+import { LoggerService } from './services/logger.service';
+
 /**
  * material2
  */
@@ -89,11 +97,13 @@ import { FolderStoreService } from './stores/folder-store.service';
 import { SlideStoreService } from './stores/slide-store.service';
 import { SlideWalkerComponent } from './components/widget/slide-walker/slide-walker.component';
 import { SlidePresenterComponent } from './components/widget/slide-presenter/slide-presenter.component';
+import { SlideBrowserComponent } from './components/widget/slide-browser/slide-browser.component';
 
 /**
  * default route definition
  */
 const appRoutes: Routes = [
+  { path: 'browser', component: SlideBrowserComponent, canActivate: [ProfileGuard] },
   { path: '', component: HomeComponent, canActivate: [ProfileGuard] },
   { path: '**', component: HomeComponent, canActivate: [ProfileGuard] }
 ];
@@ -103,10 +113,15 @@ const appRoutes: Routes = [
     AppComponent,
     HomeComponent,
     SlideWalkerComponent,
-    SlidePresenterComponent
+    SlidePresenterComponent,
+    SlideBrowserComponent
   ],
   imports: [
+    CommonModule,
     BrowserModule,
+    BrowserAnimationsModule,
+    FormsModule,
+    HttpModule,
     /**
      * material2
      */
@@ -170,16 +185,22 @@ const appRoutes: Routes = [
     })
   ],
   providers: [
-      /**
-       * guards
-       */
-      ProfileGuard,
-      /**
-       * stores
-       */
-      FolderStoreService,
-      SlideStoreService
-    ],
+    /**
+     * guards
+     */
+    ProfileGuard,
+    /**
+     * stores
+     */
+    FolderStoreService,
+    SlideStoreService,
+    ConfigurationService,
+    DataSlidesService,
+    DataStoreService,
+    SecurityService,
+    WindowService,
+    LoggerService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
