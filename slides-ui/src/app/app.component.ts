@@ -37,13 +37,7 @@ export class AppComponent {
   }
 
   ngOnInit() {
-    this.items = [
-      { label: 'Stats', icon: 'fa-bar-chart' },
-      { label: 'Calendar', icon: 'fa-calendar' },
-      { label: 'Documentation', icon: 'fa-book' },
-      { label: 'Support', icon: 'fa-support' },
-      { label: 'Social', icon: 'fa-twitter' }
-    ];
+    this.loadMenu();
 
     this.folderStoreService.dispatch(new SelectFolderAction(
       {
@@ -101,5 +95,26 @@ export class AppComponent {
         ]
       }
     ));
+  }
+
+  /**
+   * load system menu
+   */
+  private loadMenu(): void {
+    this.items = [
+      { label: 'Stats', icon: 'fa-bar-chart', routerLink: ['/browser'] },
+      {
+        label: 'File',
+        items: [
+          { label: 'New', icon: 'fa-plus' },
+          { label: 'Open', icon: 'fa-download' },
+          { label: 'Save', icon: 'fa-save' }
+        ]
+      },
+      { label: 'Calendar', icon: 'fa-calendar' },
+      { label: 'Documentation', icon: 'fa-book' },
+      { label: 'Support', icon: 'fa-support' },
+      { label: 'Social', icon: 'fa-twitter' }
+    ];
   }
 }

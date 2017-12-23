@@ -1,3 +1,22 @@
-<p>
-  slide-browser works!
-</p>
+<div *ngIf="slides" class="ui-g ui-fluid">
+  <div class="ui-g-2 ui-sm-6">
+    <p-orderList [value]="slides" [listStyle]="{'height':'100%'}" [responsive]="true" filter="filter" filterBy="name" filterPlaceHolder="Nom"
+      (onSelectionChange)="onSelectionChangeHandler($event)">
+      <p-header>
+        Slides
+      </p-header>
+      <ng-template let-slide pTemplate="item">
+        <div class="ui-helper-clearfix">
+          <div style="font-size:14px;float:right;margin:15px 5px 0 0">{{slide.name}}</div>
+        </div>
+      </ng-template>
+    </p-orderList>
+  </div>
+  <div class="ui-g-10 ui-sm-6">
+    <p-editor [(ngModel)]="slide.body" toolba="true" [style]="{'height':'100%', 'width':'100%'}">
+    </p-editor>
+    <button pButton type="button" label="Sauvegarder" (click)="onSave()"></button>
+  </div>
+</div>
+
+

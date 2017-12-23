@@ -16,6 +16,8 @@
 
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
 import { Observable } from 'rxjs/Observable';
 import { Http, Response, Headers } from '@angular/http';
 
@@ -80,7 +82,8 @@ export class DataCoreResource<T extends EntityBean> implements DefaultResource<T
     public GetAll = (): Observable<T[]> => {
         this.headers.set('AuthToken', this.configuration.getAuthToken());
         return this.http.get(this.actionUrl, { headers: this.headers })
-            .map((response: Response) => <T[]>response.json());
+            .map((response: Response) => <T[]>response.json())
+            .catch(this.handleError);
     }
 
     /**

@@ -54,7 +54,7 @@ import { MatFormFieldModule } from '@angular/material';
 /**
  * primeng
  */
-import { ButtonModule } from 'primeng/primeng';
+import { ButtonModule, OrderListModule, EditorModule } from 'primeng/primeng';
 import { ChartModule } from 'primeng/primeng';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { MenubarModule, MenuModule } from 'primeng/primeng';
@@ -151,6 +151,8 @@ const appRoutes: Routes = [
     InputTextareaModule,
     DataListModule,
     TabViewModule,
+    OrderListModule,
+    EditorModule,
     DataGridModule,
     PanelModule,
     GrowlModule,

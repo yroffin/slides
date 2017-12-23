@@ -18,6 +18,8 @@ import { Component, OnInit } from '@angular/core';
 import { DataSlidesService } from '../../../services/data-slides.service';
 import { LoggerService } from '../../../services/logger.service';
 import { SlideBean } from '../../../models/common/slide-bean';
+import { SlideStoreService, SelectSlideAction } from '../../../stores/slide-store.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-slide-browser',
@@ -26,22 +28,65 @@ import { SlideBean } from '../../../models/common/slide-bean';
 })
 export class SlideBrowserComponent implements OnInit {
 
+  protected slides: SlideBean[] = [];
+  protected slideStream: Observable<SlideBean> = new Observable<SlideBean>();
+  protected slide: SlideBean = <SlideBean>{ body: '' };
+
   constructor(
+    private slideStoreService: SlideStoreService,
     private dataSlidesService: DataSlidesService,
     private logger: LoggerService
   ) {
+    /**
+     * find the folder store
+     */
+    this.slideStream = this.slideStoreService.select();
 
+    this.slideStream.subscribe(
+      (element: SlideBean) => {
+        this.slide = element;
+      },
+      error => {
+        console.error(error);
+      },
+      () => {
+      }
+    );
   }
 
   ngOnInit() {
-    let all: SlideBean[]
     this.dataSlidesService.GetAll()
       .subscribe(
-      (data: SlideBean[]) => all = data,
+      (data: SlideBean[]) => this.slides = data,
       error => this.logger.error("In loadResource", error),
       () => {
-        this.logger.error("In loadResource", all)
       });
   }
 
+  /**
+   * selection handler
+   * @param data 
+   */
+  protected onSelectionChangeHandler(data: any) {
+    this.slideStoreService.dispatch(new SelectSlideAction(
+      data.value[0]
+    ));
+  }
+
+  /**
+   * selection handler
+   * @param data 
+   */
+  protected onSave() {
+    let updated: SlideBean
+    this.dataSlidesService.Update(this.slide.id, this.slide)
+      .subscribe(
+      (data: SlideBean) => updated = data,
+      error => this.logger.error("While updating", this.slide, error),
+      () => {
+        this.slideStoreService.dispatch(new SelectSlideAction(
+          updated
+        ));
+      });
+  }
 }
