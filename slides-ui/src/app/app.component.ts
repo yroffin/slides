@@ -17,9 +17,16 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 
+import { HomeComponent } from './components/common/home/home.component';
 import { FolderStoreService, SelectFolderAction } from './stores/folder-store.service';
 
 import { MenuItem } from 'primeng/primeng';
+import { DataSlidesService } from './services/data-slides.service';
+import { LoggerService } from './services/logger.service';
+import { SlideBean } from './models/common/slide-bean';
+import { SlidesStoreService, LoadSlidesAction } from './stores/sides-store.service';
+import { Store } from '@ngrx/store/src/store';
+import { SlideStoreService, SelectSlideAction } from './stores/slide-store.service';
 
 @Component({
   selector: 'app-root',
@@ -29,72 +36,64 @@ import { MenuItem } from 'primeng/primeng';
 export class AppComponent {
   title = 'app';
   items: MenuItem[];
+  display: boolean = false
+
+  slidesStream: Store<SlideBean[]>;
+  slides: SlideBean[]
 
   constructor(
-    private folderStoreService: FolderStoreService
+    private folderStoreService: FolderStoreService,
+    private dataSlidesService: DataSlidesService,
+    private slideStoreService: SlideStoreService,
+    private slidesStoreService: SlidesStoreService,
+    private logger: LoggerService
   ) {
+    /**
+     * find the folder store
+     */
+    this.slidesStream = this.slidesStoreService.select();
 
+    this.slidesStream.subscribe(
+      (element: SlideBean[]) => {
+        this.slides = element;
+      },
+      error => {
+        console.error(error);
+      },
+      () => {
+      }
+    );
   }
 
   ngOnInit() {
     this.loadMenu();
+    this.loadSlides();
+  }
 
-    this.folderStoreService.dispatch(new SelectFolderAction(
-      {
-        'id': 'teszaet',
-        'name': 'default',
-        'slides': [
-          {
-            'id': '1',
-            'title': 'titre 1',
-            'subtitle': 'subtitle 1',
-            'body': 'data ... todo ...',
-            slides: [
-              {
-                'id': '1.1',
-                'title': 'title 1.a',
-                'subtitle': 'subtitle 1.a',
-                'body': 'data ... todo ... zaezeazazezae<p>qsdsqmdlksd</p>',
-                slides: [
-                ]
-              },
-              {
-                'id': '1.2',
-                'title': 'title 1.b',
-                'subtitle': 'subtitle 1.b',
-                'body': 'data ... xxx ...',
-                slides: [
-                ]
-              }
-            ]
-          },
-          {
-            'id': '2',
-            'title': 'title 2',
-            'subtitle': 'subtitle default',
-            'body': 'data ... todo ...',
-            slides: [
-              {
-                'id': '2.1',
-                'title': 'title 2.a',
-                'subtitle': 'subtitle 2.a',
-                'body': 'data ... todo ...',
-                slides: [
-                ]
-              },
-              {
-                'id': '2.2',
-                'title': 'title 2.b',
-                'subtitle': 'subtitle 2.b',
-                'body': 'data ... ttttt ...',
-                slides: [
-                ]
-              }
-            ]
-          }
-        ]
-      }
+  /**
+   * selection handler
+   * @param data 
+   */
+  protected onSelectionChangeHandler(data: any) {
+    this.slideStoreService.dispatch(new SelectSlideAction(
+      data.value[0]
     ));
+  }
+
+  /**
+   * load all slides
+   */
+  private loadSlides() {
+    let slides
+    this.dataSlidesService.GetAll()
+      .subscribe(
+      (data: SlideBean[]) => slides = data,
+      error => this.logger.error("While loading resources", error),
+      () => {
+        this.slidesStoreService.dispatch(new LoadSlidesAction(
+          slides
+        ));
+      });
   }
 
   /**
@@ -102,7 +101,11 @@ export class AppComponent {
    */
   private loadMenu(): void {
     this.items = [
-      { label: 'Stats', icon: 'fa-bar-chart', routerLink: ['/browser'] },
+      {
+        label: 'Calendar', icon: 'fa-calendar', command: (event) => {
+          this.display = true;
+        }
+      },
       {
         label: 'File',
         items: [
@@ -111,7 +114,12 @@ export class AppComponent {
           { label: 'Save', icon: 'fa-save' }
         ]
       },
-      { label: 'Calendar', icon: 'fa-calendar' },
+      { label: 'Browse', icon: 'fa-flask', routerLink: ['/browser'] },
+      {
+        label: 'Calendar', icon: 'fa-calendar', command: (event) => {
+          window.open("/api/presentation", "_blank");
+        }
+      },
       { label: 'Documentation', icon: 'fa-book' },
       { label: 'Support', icon: 'fa-support' },
       { label: 'Social', icon: 'fa-twitter' }

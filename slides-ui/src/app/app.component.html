@@ -1,2 +1,17 @@
+<p-sidebar [(visible)]="display" [fullScreen]="false">
+    <div *ngIf="slides">
+        <p-orderList [value]="slides" [listStyle]="{'height':'100%'}" [responsive]="true" filter="filter" filterBy="name" filterPlaceHolder="Nom"
+            (onSelectionChange)="onSelectionChangeHandler($event)">
+            <p-header>
+                Slides
+            </p-header>
+            <ng-template let-slide pTemplate="item">
+                <div class="ui-helper-clearfix">
+                    <div>{{slide.name}}</div>
+                </div>
+            </ng-template>
+        </p-orderList>
+    </div>
+</p-sidebar>
 <p-menubar [model]="items"></p-menubar>
 <router-outlet></router-outlet>

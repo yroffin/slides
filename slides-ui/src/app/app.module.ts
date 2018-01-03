@@ -55,6 +55,8 @@ import { MatFormFieldModule } from '@angular/material';
  * primeng
  */
 import { ButtonModule, OrderListModule, EditorModule } from 'primeng/primeng';
+import { SidebarModule } from 'primeng/primeng';
+import { CarouselModule } from 'primeng/primeng';
 import { ChartModule } from 'primeng/primeng';
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 import { MenubarModule, MenuModule } from 'primeng/primeng';
@@ -98,6 +100,7 @@ import { SlideStoreService } from './stores/slide-store.service';
 import { SlideWalkerComponent } from './components/widget/slide-walker/slide-walker.component';
 import { SlidePresenterComponent } from './components/widget/slide-presenter/slide-presenter.component';
 import { SlideBrowserComponent } from './components/widget/slide-browser/slide-browser.component';
+import { SlidesStoreService } from './stores/sides-store.service';
 
 /**
  * default route definition
@@ -140,6 +143,8 @@ const appRoutes: Routes = [
     /**
      * primeface
      */
+    SidebarModule,
+    CarouselModule,
     DataTableModule,
     SharedModule,
     MenuModule,
@@ -174,6 +179,7 @@ const appRoutes: Routes = [
     SliderModule,
     ToggleButtonModule,
     TabMenuModule,
+    CarouselModule,
     /**
      * routes
      */
@@ -183,6 +189,7 @@ const appRoutes: Routes = [
      */
     StoreModule.forRoot({
       slide: SlideStoreService.reducer,
+      slides: SlidesStoreService.reducer,
       folder: FolderStoreService.reducer
     })
   ],
@@ -196,6 +203,7 @@ const appRoutes: Routes = [
      */
     FolderStoreService,
     SlideStoreService,
+    SlidesStoreService,
     ConfigurationService,
     DataSlidesService,
     DataStoreService,

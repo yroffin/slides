@@ -28,7 +28,6 @@ import { Observable } from 'rxjs/Observable';
 })
 export class SlideBrowserComponent implements OnInit {
 
-  protected slides: SlideBean[] = [];
   protected slideStream: Observable<SlideBean> = new Observable<SlideBean>();
   protected slide: SlideBean = <SlideBean>{ body: '' };
 
@@ -55,22 +54,6 @@ export class SlideBrowserComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.dataSlidesService.GetAll()
-      .subscribe(
-      (data: SlideBean[]) => this.slides = data,
-      error => this.logger.error("In loadResource", error),
-      () => {
-      });
-  }
-
-  /**
-   * selection handler
-   * @param data 
-   */
-  protected onSelectionChangeHandler(data: any) {
-    this.slideStoreService.dispatch(new SelectSlideAction(
-      data.value[0]
-    ));
   }
 
   /**
