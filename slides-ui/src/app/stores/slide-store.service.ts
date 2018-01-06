@@ -43,7 +43,7 @@ export class SelectSlideAction implements ActionWithPayload<SlideBean> {
   constructor(public payload: SlideBean) {}
 }
 
-export type AllSlideActions = SelectSlideAction;  
+export type AllSlideActions = SelectSlideAction; 
 
 /**
  * main store for this application

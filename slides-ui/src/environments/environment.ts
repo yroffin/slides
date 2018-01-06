@@ -5,5 +5,5 @@
 
 export const environment = {
   production: false,
-  enableTracing: true
+  enableTracing: false
 };

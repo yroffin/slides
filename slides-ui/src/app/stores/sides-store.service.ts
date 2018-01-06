@@ -32,7 +32,7 @@ export interface AppState {
 }
 
 export interface SlideState {
-	slides: SlideBean[];
+  slides: SlideBean[];
 }
 
 /**
@@ -40,10 +40,20 @@ export interface SlideState {
  */
 export class LoadSlidesAction implements ActionWithPayload<SlideBean[]> {
   readonly type = 'LoadSlidesAction';
-  constructor(public payload: SlideBean[]) {}
+  constructor(public payload: SlideBean[]) { }
 }
 
-export type AllSlidesActions = LoadSlidesAction;  
+export class AddSlidesAction implements ActionWithPayload<SlideBean> {
+  readonly type = 'AddSlidesAction';
+  constructor(public payload: SlideBean) { }
+}
+
+export class DeleteSlidesAction implements ActionWithPayload<string> {
+  readonly type = 'DeleteSlidesAction';
+  constructor(public payload: string) { }
+}
+
+export type AllSlidesActions = LoadSlidesAction | AddSlidesAction | DeleteSlidesAction;
 
 /**
  * main store for this application
@@ -52,7 +62,7 @@ export type AllSlidesActions = LoadSlidesAction;
 export class SlidesStoreService {
 
   public static getSlides: MemoizedSelector<object, SlideBean[]>;
-  
+
   /**
    * 
    * @param _store constructor
@@ -60,7 +70,7 @@ export class SlidesStoreService {
   constructor(
     private _store: Store<SlideState>
   ) {
-    SlidesStoreService.getSlides =  createSelector(createFeatureSelector<SlideState>('slides'), (state: SlideState) => state.slides); 
+    SlidesStoreService.getSlides = createSelector(createFeatureSelector<SlideState>('slides'), (state: SlideState) => state.slides);
   }
 
   /**
@@ -69,7 +79,7 @@ export class SlidesStoreService {
   public select(): Store<SlideBean[]> {
     return this._store.select(SlidesStoreService.getSlides);
   }
-  
+
   /**
    * 
    * @param action dispatch action
@@ -83,14 +93,30 @@ export class SlidesStoreService {
    * @param state 
    * @param action 
    */
-  public static reducer(state: SlideState = {slides: new Array<SlideBean>()}, action: AllSlidesActions): SlideState {
+  public static reducer(state: SlideState = { slides: new Array<SlideBean>() }, action: AllSlidesActions): SlideState {
     switch (action.type) {
       /**
        * message incomming
        */
       case 'LoadSlidesAction':
         {
-          return {slides: action.payload};
+          return { slides: action.payload };
+        }
+
+      case 'AddSlidesAction':
+        {
+          let current = Object.assign([], state.slides);
+          current.push(action.payload);
+          return { slides: current };
+        }
+
+      case 'DeleteSlidesAction':
+        {
+          let current = Object.assign([], state.slides);
+          _.remove(current, (item) => {
+            return item.id === action.payload
+          })
+          return { slides: current };
         }
 
       default:

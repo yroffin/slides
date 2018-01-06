@@ -17,6 +17,7 @@
 import { EntityBean } from './entity-bean';
 
 export class SlideBean extends EntityBean {
+    name: string
     title: string;
     subtitle: string;
     body: string;

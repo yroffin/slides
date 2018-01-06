@@ -17,6 +17,8 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 
+import * as _ from 'lodash';
+
 import { HomeComponent } from './components/common/home/home.component';
 import { FolderStoreService, SelectFolderAction } from './stores/folder-store.service';
 
@@ -24,7 +26,7 @@ import { MenuItem } from 'primeng/primeng';
 import { DataSlidesService } from './services/data-slides.service';
 import { LoggerService } from './services/logger.service';
 import { SlideBean } from './models/common/slide-bean';
-import { SlidesStoreService, LoadSlidesAction } from './stores/sides-store.service';
+import { SlidesStoreService, LoadSlidesAction, AddSlidesAction, DeleteSlidesAction } from './stores/sides-store.service';
 import { Store } from '@ngrx/store/src/store';
 import { SlideStoreService, SelectSlideAction } from './stores/slide-store.service';
 
@@ -40,6 +42,8 @@ export class AppComponent {
 
   slidesStream: Store<SlideBean[]>;
   slides: SlideBean[]
+  slideStream: Store<SlideBean>;
+  slide: SlideBean
 
   constructor(
     private folderStoreService: FolderStoreService,
@@ -49,7 +53,7 @@ export class AppComponent {
     private logger: LoggerService
   ) {
     /**
-     * find the folder store
+     * subscribe for all slides store
      */
     this.slidesStream = this.slidesStoreService.select();
 
@@ -63,21 +67,125 @@ export class AppComponent {
       () => {
       }
     );
+
+    /**
+     * subscribe for current slide
+     */
+    this.slideStream = this.slideStoreService.select();
+
+    this.slideStream.subscribe(
+      (element: SlideBean) => {
+        this.slide = element;
+      },
+      error => {
+        console.error(error);
+      },
+      () => {
+      }
+    );
   }
 
   ngOnInit() {
+    // load the menu
     this.loadMenu();
+    // load all slides
     this.loadSlides();
   }
 
   /**
-   * selection handler
+   * select a new slide
    * @param data 
    */
-  protected onSelectionChangeHandler(data: any) {
+  protected onSelectionChangeHandler(event: any) {
     this.slideStoreService.dispatch(new SelectSlideAction(
-      data.value[0]
+      event.data
     ));
+    this.display = false;
+  }
+
+  /**
+   * add a new slide
+   * @param data 
+   */
+  protected onCreate(event: any) {
+    let slide: SlideBean = new SlideBean();
+    slide.name = "Nouveau slide";
+    slide.body = "Todo ...";
+    this.dataSlidesService.Add(slide).subscribe(
+      (data) => {
+        this.slidesStoreService.dispatch(new AddSlidesAction(
+          data
+        ));
+        this.slideStoreService.dispatch(new SelectSlideAction(
+          data
+        ));
+      }
+    );
+  }
+
+  /**
+   * duplicate current
+   * @param data 
+   */
+  protected onDuplicate(event: any) {
+    let slide: SlideBean = Object.assign(new SlideBean(), this.slide);
+    slide.name = slide.name + " - copy"
+    this.dataSlidesService.Add(slide).subscribe(
+      (data) => {
+        this.slidesStoreService.dispatch(new AddSlidesAction(
+          data
+        ));
+        this.slidesStream.subscribe(
+          (element: SlideBean[]) => {
+            let duplicate = _.find(element, (item) => {
+              return item.id === data.id
+            })
+            this.slideStoreService.dispatch(new SelectSlideAction(
+              duplicate
+            ));
+          },
+          error => {
+            console.error(error);
+          },
+          () => {
+          }
+        );
+      }
+    );
+  }
+
+  /**
+   * delete current
+   * @param data 
+   */
+  protected onDelete(event: any) {
+    this.dataSlidesService.Delete(this.slide.id).subscribe(
+      (data) => {
+        this.slidesStoreService.dispatch(new DeleteSlidesAction(
+          this.slide.id
+        ));
+        this.slidesStream.subscribe(
+          (element: SlideBean[]) => {
+            this.slideStoreService.dispatch(new SelectSlideAction(
+              element[0]
+            ));
+          },
+          error => {
+            console.error(error);
+          },
+          () => {
+          }
+        );
+      }
+    );
+  }
+
+  /**
+   * open in a new window the current presentation
+   * @param data 
+   */
+  protected onOpenDocument(event: any) {
+    window.open("/api/presentation", "_blank");
   }
 
   /**
@@ -92,6 +200,9 @@ export class AppComponent {
       () => {
         this.slidesStoreService.dispatch(new LoadSlidesAction(
           slides
+        ));
+        this.slideStoreService.dispatch(new SelectSlideAction(
+          slides[0]
         ));
       });
   }

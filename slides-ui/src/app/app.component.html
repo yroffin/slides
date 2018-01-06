@@ -1,17 +1,26 @@
-<p-sidebar [(visible)]="display" [fullScreen]="false">
+<p-sidebar [(visible)]="display" [fullScreen]="false" [style]="{width:'50%'}">
     <div *ngIf="slides">
-        <p-orderList [value]="slides" [listStyle]="{'height':'100%'}" [responsive]="true" filter="filter" filterBy="name" filterPlaceHolder="Nom"
-            (onSelectionChange)="onSelectionChangeHandler($event)">
-            <p-header>
-                Slides
-            </p-header>
-            <ng-template let-slide pTemplate="item">
-                <div class="ui-helper-clearfix">
-                    <div>{{slide.name}}</div>
-                </div>
-            </ng-template>
-        </p-orderList>
+        <p-dataTable [value]="slides" (onRowClick)="onSelectionChangeHandler($event)" selectionMode="single" filter="true" filterPlaceholder="Rechercher"
+            header="Slide" sortField="name" sortable="true" [rows]="10" [paginator]="true">
+            <p-column field="id" header="Id."></p-column>
+            <p-column field="name" header="Nom"></p-column>
+        </p-dataTable>
     </div>
 </p-sidebar>
-<p-menubar [model]="items"></p-menubar>
+<p-toolbar>
+    <div class="ui-toolbar-group-left">
+        <button pButton type="button" label="Slides" icon="fa-table" (click)="display = true"></button>
+        <i class="fa fa-bars"></i>
+        <button pButton type="button" icon="fa-folder-open"></button>
+        <i class="fa fa-bars"></i>
+        <button pButton type="button" icon="fa-plus" (click)="onCreate($event)"></button>
+        <button pButton type="button" icon="fa-copy" (click)="onDuplicate($event)"></button>
+        <button pButton type="button" icon="fa-trash" (click)="onDelete($event)"></button>
+    </div>
+
+    <div class="ui-toolbar-group-right">
+        <button pButton type="button" icon="fa-refresh" (click)="onOpenDocument($event)"></button>
+        <button pButton type="button" icon="fa-search"></button>
+    </div>
+</p-toolbar>
 <router-outlet></router-outlet>

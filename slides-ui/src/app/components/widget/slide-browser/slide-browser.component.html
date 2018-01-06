@@ -2,11 +2,17 @@
   <div class="ui-g-12 ui-sm-12">
     <div class="ui-inputgroup">
       <span class="ui-inputgroup-addon">
-        <i class="fa fa-file-powerpoint-o"></i>
+        <i class="fa fa-tag"></i>
       </span>
-      <input type="text" [(ngModel)]="slide.name" pInputText placeholder="Title">
+      <input type="text" [(ngModel)]="slide.id" pInputText placeholder="Id." disabled>
     </div>
-    <p-editor [(ngModel)]="slide.body" toolba="true" [style]="{'height':'100%', 'width':'100%'}">
+    <div class="ui-inputgroup">
+        <span class="ui-inputgroup-addon">
+          <i class="fa fa-file-powerpoint-o"></i>
+        </span>
+        <input type="text" [(ngModel)]="slide.name" pInputText placeholder="Title">
+      </div>
+      <p-editor [(ngModel)]="slide.body" toolba="true" [style]="{'height':'100%', 'width':'100%'}">
     </p-editor>
     <button pButton type="button" label="Sauvegarder" (click)="onSave()"></button>
   </div>
