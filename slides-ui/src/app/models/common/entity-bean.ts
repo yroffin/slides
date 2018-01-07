@@ -16,4 +16,5 @@
 
  export class EntityBean {
      id: string
+     timestamp: Date
 }

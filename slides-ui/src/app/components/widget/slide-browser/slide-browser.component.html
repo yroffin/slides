@@ -7,13 +7,18 @@
       <input type="text" [(ngModel)]="slide.id" pInputText placeholder="Id." disabled>
     </div>
     <div class="ui-inputgroup">
-        <span class="ui-inputgroup-addon">
-          <i class="fa fa-file-powerpoint-o"></i>
-        </span>
-        <input type="text" [(ngModel)]="slide.name" pInputText placeholder="Title">
-      </div>
-      <p-editor [(ngModel)]="slide.body" toolba="true" [style]="{'height':'100%', 'width':'100%'}">
+      <span class="ui-inputgroup-addon">
+        <i class="fa fa-time"></i>
+      </span>
+      <input type="text" [(ngModel)]="slide.timestamp" pInputText placeholder="Dernière mise à jour" disabled>
+    </div>
+    <div class="ui-inputgroup">
+      <span class="ui-inputgroup-addon">
+        <i class="fa fa-file-powerpoint-o"></i>
+      </span>
+      <input type="text" [(ngModel)]="slide.name" pInputText placeholder="Title">
+    </div>
+    <p-editor [(ngModel)]="slide.body" toolba="true" [style]="{'height':'100%', 'width':'100%'}">
     </p-editor>
-    <button pButton type="button" label="Sauvegarder" (click)="onSave()"></button>
   </div>
 </div>

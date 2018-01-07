@@ -181,6 +181,57 @@ export class AppComponent {
   }
 
   /**
+   * selection handler
+   * @param data 
+   */
+  protected onSave() {
+    let updated: SlideBean
+    this.dataSlidesService.Update(this.slide.id, this.slide)
+      .subscribe(
+      (data: SlideBean) => updated = data,
+      error => this.logger.error("While updating", this.slide, error),
+      () => {
+        this.slideStoreService.dispatch(new SelectSlideAction(
+          updated
+        ));
+      });
+  }
+
+  /**
+   * next
+   * @param data 
+   */
+  protected onNext(event: any) {
+    let index = _.findIndex(this.slides, (item) => {
+      return item.id === this.slide.id
+    })
+    index++
+    if(index > this.slides.length - 1) {
+      index = 0;
+    }
+    this.slideStoreService.dispatch(new SelectSlideAction(
+      this.slides[index]
+    ));
+  }
+
+  /**
+   * prev
+   * @param data 
+   */
+  protected onPrev(event: any) {
+    let index = _.findIndex(this.slides, (item) => {
+      return item.id === this.slide.id
+    })
+    index--
+    if(index < 0) {
+      index = this.slides.length - 1;
+    }
+    this.slideStoreService.dispatch(new SelectSlideAction(
+      this.slides[index]
+    ));
+  }
+
+  /**
    * open in a new window the current presentation
    * @param data 
    */

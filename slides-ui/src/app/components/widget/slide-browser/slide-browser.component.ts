@@ -55,21 +55,4 @@ export class SlideBrowserComponent implements OnInit {
 
   ngOnInit() {
   }
-
-  /**
-   * selection handler
-   * @param data 
-   */
-  protected onSave() {
-    let updated: SlideBean
-    this.dataSlidesService.Update(this.slide.id, this.slide)
-      .subscribe(
-      (data: SlideBean) => updated = data,
-      error => this.logger.error("While updating", this.slide, error),
-      () => {
-        this.slideStoreService.dispatch(new SelectSlideAction(
-          updated
-        ));
-      });
-  }
 }
