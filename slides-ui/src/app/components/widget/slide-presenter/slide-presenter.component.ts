@@ -20,8 +20,8 @@ import { State, Store } from '@ngrx/store';
 
 import * as _ from 'lodash';
 
-import { SlideStoreService } from '../../../stores/slide-store.service';
 import { SlideBean } from '../../../models/common/slide-bean';
+import { SlidesStoreService } from '../../../stores/slides-store.service';
 
 @Component({
   selector: 'app-slide-presenter',
@@ -34,12 +34,12 @@ export class SlidePresenterComponent implements OnInit {
   public slide: SlideBean = null;
 
   constructor(
-    private slideStoreService: SlideStoreService
+    private slideStoreService: SlidesStoreService
   ) {
     /**
      * find the folder store
      */
-    this.slideStream = this.slideStoreService.select();
+    this.slideStream = this.slideStoreService.slide();
 
     this.slideStream.subscribe(
       (element: SlideBean) => {

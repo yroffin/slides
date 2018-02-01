@@ -1,30 +1,28 @@
-<p-sidebar [(visible)]="display" [fullScreen]="false" [style]="{width:'50%'}">
-    <div *ngIf="slides">
-        <p-dataTable [value]="slides" (onRowClick)="onSelectionChangeHandler($event)" selectionMode="single" filter="true" filterPlaceholder="Rechercher"
-            header="Slide" sortField="name" sortable="true" [rows]="10" [paginator]="true">
-            <p-column field="id" header="Id."></p-column>
-            <p-column field="name" header="Nom"></p-column>
-        </p-dataTable>
-    </div>
+<p-sidebar [(visible)]="left" [fullScreen]="false" [style]="{width:'50%'}">
+    <p-panelMenu [model]="items" [style]="{'width':'300px'}"></p-panelMenu>
 </p-sidebar>
-<p-toolbar>
-    <div class="ui-toolbar-group-left">
-        <button pButton type="button" label="Slides" icon="fa-table" (click)="display = true"></button>
-        <i class="fa fa-bars"></i>
-        <button pButton type="button" icon="fa-folder-open"></button>
-        <i class="fa fa-bars"></i>
-        <button pButton type="button" icon="fa-plus" (click)="onCreate($event)"></button>
-        <button pButton type="button" icon="fa-copy" (click)="onDuplicate($event)"></button>
-        <button pButton type="button" icon="fa-trash" (click)="onDelete($event)"></button>
-        <i class="fa fa-bars"></i>
-        <button pButton type="button" icon="fa-save" (click)="onSave()"></button>
-        <button pButton type="button" icon="fa-chevron-left" (click)="onPrev()"></button>
-        <button pButton type="button" icon="fa-chevron-right" (click)="onNext()"></button>
-    </div>
-
-    <div class="ui-toolbar-group-right">
-        <button pButton type="button" icon="fa-refresh" (click)="onOpenDocument($event)"></button>
-        <button pButton type="button" icon="fa-search"></button>
-    </div>
-</p-toolbar>
+<p-sidebar [(visible)]="right" [fullScreen]="false" [style]="{width:'50%'}">
+    <p-tabView>
+        <p-tabPanel header="Folders">
+            <div *ngIf="folders">
+                <p-dataTable [value]="folders" (onRowClick)="onFolderChangeHandler($event)" selectionMode="single" filter="true" filterPlaceholder="Rechercher"
+                    header="Folder" sortField="order" sortable="true" [rows]="10" [paginator]="true">
+                    <p-column field="id" header="Id."></p-column>
+                    <p-column field="name" header="Nom"></p-column>
+                </p-dataTable>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="Slides">
+            <div *ngIf="slides">
+                <p-dataTable [value]="slides" (onRowClick)="onSlideChangeHandler($event)" selectionMode="single" filter="true" filterPlaceholder="Rechercher"
+                    header="Slide" sortField="order" sortable="true" [rows]="10" [paginator]="true">
+                    <p-column field="id" header="Id."></p-column>
+                    <p-column field="name" header="Nom"></p-column>
+                </p-dataTable>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</p-sidebar>
+<p-tabMenu [model]="tools"></p-tabMenu>
+<p></p>
 <router-outlet></router-outlet>

@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-import { EntityBean } from './entity-bean';
+import * as _ from 'lodash';
+import { SlideWidget } from './slide-widget.class';
+import { AbstractWidget } from './abstract-widget.class';
+import { FolderBean } from '../../../../models/common/folder-bean';
 
-export class SlideBean extends EntityBean {
-    name: string
-    title: string
-    subtitle: string
-    body: string
-    order: string
-    slides: Array<SlideBean>
+export class SlideEntry {
+
+  private folder: FolderBean;
+  private widget: SlideWidget;
+
+  constructor(folder: FolderBean, widget: SlideWidget) {
+    this.folder = folder;
+    this.widget = widget;
+  }
+
+  public getFolder(): FolderBean {
+    return this.folder;
+  }
+
+  public getWidget(): SlideWidget {
+    return this.widget;
+  }
 }

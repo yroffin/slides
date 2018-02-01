@@ -18,8 +18,8 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { State, Store } from '@ngrx/store';
 
-import { FolderStoreService } from '../../../stores/folder-store.service';
 import { FolderBean } from '../../../models/common/folder-bean';
+import { FoldersStoreService } from '../../../stores/folders-store.service';
 
 @Component({
   selector: 'app-home',
@@ -31,12 +31,12 @@ export class HomeComponent implements OnInit {
   public folderStream: Observable<FolderBean> = new Observable<FolderBean>();
 
   constructor(
-    private folderStoreService: FolderStoreService
+    private foldersStoreService: FoldersStoreService
   ) {
     /**
      * find the folder store
      */
-    this.folderStream = this.folderStoreService.select();
+    this.folderStream = this.foldersStoreService.folder();
   }
 
   ngOnInit() {

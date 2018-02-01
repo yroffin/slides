@@ -20,15 +20,16 @@ import { Observable } from 'rxjs/Rx';
 import * as _ from 'lodash';
 
 import { HomeComponent } from './components/common/home/home.component';
-import { FolderStoreService, SelectFolderAction } from './stores/folder-store.service';
 
 import { MenuItem } from 'primeng/primeng';
 import { DataSlidesService } from './services/data-slides.service';
 import { LoggerService } from './services/logger.service';
 import { SlideBean } from './models/common/slide-bean';
-import { SlidesStoreService, LoadSlidesAction, AddSlidesAction, DeleteSlidesAction } from './stores/sides-store.service';
+import { SlidesStoreService, LoadSlidesAction, AddSlidesAction, DeleteSlidesAction, SelectSlideAction } from './stores/slides-store.service';
 import { Store } from '@ngrx/store/src/store';
-import { SlideStoreService, SelectSlideAction } from './stores/slide-store.service';
+import { FolderBean } from './models/common/folder-bean';
+import { FoldersStoreService, LoadFoldersAction, SelectFolderAction } from './stores/folders-store.service';
+import { DataFoldersService } from './services/data-folders.service';
 
 @Component({
   selector: 'app-root',
@@ -38,24 +39,75 @@ import { SlideStoreService, SelectSlideAction } from './stores/slide-store.servi
 export class AppComponent {
   title = 'app';
   items: MenuItem[];
-  display: boolean = false
+  tools: MenuItem[];
 
+  right: boolean = false
+  left: boolean = false
+
+  // folders
+  foldersStream: Store<FolderBean[]>;
+  folders: FolderBean[]
+  folderStream: Store<FolderBean>;
+  folder: FolderBean
+
+  // slides
   slidesStream: Store<SlideBean[]>;
   slides: SlideBean[]
   slideStream: Store<SlideBean>;
   slide: SlideBean
 
+  /**
+   * constructor
+   * @param dataSlidesService 
+   * @param foldersStoreService 
+   * @param folderStoreService 
+   * @param slideStoreService 
+   * @param slidesStoreService 
+   * @param logger 
+   */
   constructor(
-    private folderStoreService: FolderStoreService,
     private dataSlidesService: DataSlidesService,
-    private slideStoreService: SlideStoreService,
+    private dataFoldersService: DataFoldersService,
+    private foldersStoreService: FoldersStoreService,
     private slidesStoreService: SlidesStoreService,
     private logger: LoggerService
   ) {
     /**
+     * subscribe for all folders store
+     */
+    this.foldersStream = this.foldersStoreService.folders();
+
+    this.foldersStream.subscribe(
+      (element: FolderBean[]) => {
+        this.folders = element;
+      },
+      error => {
+        console.error(error);
+      },
+      () => {
+      }
+    );
+
+    /**
+     * subscribe for current folder
+     */
+    this.folderStream = this.foldersStoreService.folder();
+
+    this.folderStream.subscribe(
+      (element: FolderBean) => {
+        this.folder = element;
+      },
+      error => {
+        console.error(error);
+      },
+      () => {
+      }
+    );
+
+    /**
      * subscribe for all slides store
      */
-    this.slidesStream = this.slidesStoreService.select();
+    this.slidesStream = this.slidesStoreService.slides();
 
     this.slidesStream.subscribe(
       (element: SlideBean[]) => {
@@ -71,7 +123,7 @@ export class AppComponent {
     /**
      * subscribe for current slide
      */
-    this.slideStream = this.slideStoreService.select();
+    this.slideStream = this.slidesStoreService.slide();
 
     this.slideStream.subscribe(
       (element: SlideBean) => {
@@ -90,152 +142,37 @@ export class AppComponent {
     this.loadMenu();
     // load all slides
     this.loadSlides();
+    // load all folders
+    this.loadFolders();
   }
 
   /**
    * select a new slide
-   * @param data 
+   * @param event 
    */
-  protected onSelectionChangeHandler(event: any) {
-    this.slideStoreService.dispatch(new SelectSlideAction(
+  protected onSlideChangeHandler(event: any) {
+    this.slidesStoreService.dispatch(new SelectSlideAction(
       event.data
     ));
-    this.display = false;
+    this.right = false;
   }
 
   /**
-   * add a new slide
-   * @param data 
+   * select a new folder
+   * @param event 
    */
-  protected onCreate(event: any) {
-    let slide: SlideBean = new SlideBean();
-    slide.name = "Nouveau slide";
-    slide.body = "Todo ...";
-    this.dataSlidesService.Add(slide).subscribe(
-      (data) => {
-        this.slidesStoreService.dispatch(new AddSlidesAction(
-          data
-        ));
-        this.slideStoreService.dispatch(new SelectSlideAction(
-          data
-        ));
-      }
-    );
-  }
-
-  /**
-   * duplicate current
-   * @param data 
-   */
-  protected onDuplicate(event: any) {
-    let slide: SlideBean = Object.assign(new SlideBean(), this.slide);
-    slide.name = slide.name + " - copy"
-    this.dataSlidesService.Add(slide).subscribe(
-      (data) => {
-        this.slidesStoreService.dispatch(new AddSlidesAction(
-          data
-        ));
-        this.slidesStream.subscribe(
-          (element: SlideBean[]) => {
-            let duplicate = _.find(element, (item) => {
-              return item.id === data.id
-            })
-            this.slideStoreService.dispatch(new SelectSlideAction(
-              duplicate
-            ));
-          },
-          error => {
-            console.error(error);
-          },
-          () => {
-          }
-        );
-      }
-    );
-  }
-
-  /**
-   * delete current
-   * @param data 
-   */
-  protected onDelete(event: any) {
-    this.dataSlidesService.Delete(this.slide.id).subscribe(
-      (data) => {
-        this.slidesStoreService.dispatch(new DeleteSlidesAction(
-          this.slide.id
-        ));
-        this.slidesStream.subscribe(
-          (element: SlideBean[]) => {
-            this.slideStoreService.dispatch(new SelectSlideAction(
-              element[0]
-            ));
-          },
-          error => {
-            console.error(error);
-          },
-          () => {
-          }
-        );
-      }
-    );
-  }
-
-  /**
-   * selection handler
-   * @param data 
-   */
-  protected onSave() {
-    let updated: SlideBean
-    this.dataSlidesService.Update(this.slide.id, this.slide)
-      .subscribe(
-      (data: SlideBean) => updated = data,
-      error => this.logger.error("While updating", this.slide, error),
-      () => {
-        this.slideStoreService.dispatch(new SelectSlideAction(
-          updated
-        ));
-      });
-  }
-
-  /**
-   * next
-   * @param data 
-   */
-  protected onNext(event: any) {
-    let index = _.findIndex(this.slides, (item) => {
-      return item.id === this.slide.id
-    })
-    index++
-    if(index > this.slides.length - 1) {
-      index = 0;
-    }
-    this.slideStoreService.dispatch(new SelectSlideAction(
-      this.slides[index]
+  protected onFolderChangeHandler(event: any) {
+    this.foldersStoreService.dispatch(new SelectFolderAction(
+      event.data
     ));
-  }
-
-  /**
-   * prev
-   * @param data 
-   */
-  protected onPrev(event: any) {
-    let index = _.findIndex(this.slides, (item) => {
-      return item.id === this.slide.id
-    })
-    index--
-    if(index < 0) {
-      index = this.slides.length - 1;
-    }
-    this.slideStoreService.dispatch(new SelectSlideAction(
-      this.slides[index]
-    ));
+    this.right = false;
   }
 
   /**
    * open in a new window the current presentation
    * @param data 
    */
-  protected onOpenDocument(event: any) {
+  protected onOpenDocument() {
     window.open("/api/presentation", "_blank");
   }
 
@@ -252,8 +189,24 @@ export class AppComponent {
         this.slidesStoreService.dispatch(new LoadSlidesAction(
           slides
         ));
-        this.slideStoreService.dispatch(new SelectSlideAction(
+        this.slidesStoreService.dispatch(new SelectSlideAction(
           slides[0]
+        ));
+      });
+  }
+
+  /**
+   * load all folders
+   */
+  private loadFolders() {
+    let folders
+    this.dataFoldersService.GetAll()
+      .subscribe(
+      (data: FolderBean[]) => folders = data,
+      error => this.logger.error("While loading resources", error),
+      () => {
+        this.foldersStoreService.dispatch(new LoadFoldersAction(
+          folders
         ));
       });
   }
@@ -262,10 +215,26 @@ export class AppComponent {
    * load system menu
    */
   private loadMenu(): void {
+    this.tools = [
+      {
+        label: 'Pick', icon: 'fa-tags', command: (event) => {
+          this.right = true;
+        }
+      },
+      { label: 'Sections', icon: 'fa-sitemap', routerLink: ['/sections'] },
+      { label: 'Slide', icon: 'fa-sticky-note-o', routerLink: ['/slide'] },
+      {
+        label: 'Preview', icon: 'fa-newspaper-o', command: (event) => {
+          this.onOpenDocument();
+        }
+      },
+    ];
     this.items = [
+      { label: 'Browse', icon: 'fa-tasks', routerLink: ['/sections'] },
+      { label: 'Browse', icon: 'fa-eye', routerLink: ['/slide'] },
       {
         label: 'Calendar', icon: 'fa-calendar', command: (event) => {
-          this.display = true;
+          this.right = true;
         }
       },
       {

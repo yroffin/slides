@@ -1,1 +1,0 @@
-org.springframework.boot.SpringApplicationRunListener=org.yroffin.slides.listener.SlidesListener

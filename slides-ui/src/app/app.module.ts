@@ -54,7 +54,7 @@ import { MatFormFieldModule } from '@angular/material';
 /**
  * primeng
  */
-import { ButtonModule, OrderListModule, EditorModule } from 'primeng/primeng';
+import { ButtonModule, OrderListModule, EditorModule, OverlayPanelModule } from 'primeng/primeng';
 import { SidebarModule } from 'primeng/primeng';
 import { CarouselModule } from 'primeng/primeng';
 import { ChartModule } from 'primeng/primeng';
@@ -84,6 +84,7 @@ import { TreeTableModule } from 'primeng/primeng';
 import { CalendarModule } from 'primeng/primeng';
 import { SpinnerModule } from 'primeng/primeng';
 import { SliderModule } from 'primeng/primeng';
+import { MatSliderModule } from '@angular/material/slider';
 import { ToggleButtonModule } from 'primeng/primeng';
 import { TabMenuModule } from 'primeng/primeng';
 
@@ -95,18 +96,19 @@ import { ProfileGuard } from './guards/profile.guard';
 /**
  * stores
  */
-import { FolderStoreService } from './stores/folder-store.service';
-import { SlideStoreService } from './stores/slide-store.service';
 import { SlideWalkerComponent } from './components/widget/slide-walker/slide-walker.component';
 import { SlidePresenterComponent } from './components/widget/slide-presenter/slide-presenter.component';
 import { SlideBrowserComponent } from './components/widget/slide-browser/slide-browser.component';
-import { SlidesStoreService } from './stores/sides-store.service';
+import { SlidesStoreService } from './stores/slides-store.service';
+import { FoldersStoreService } from './stores/folders-store.service';
+import { DataFoldersService } from './services/data-folders.service';
 
 /**
  * default route definition
  */
 const appRoutes: Routes = [
-  { path: 'browser', component: SlideBrowserComponent, canActivate: [ProfileGuard] },
+  { path: 'slide', component: SlideBrowserComponent, canActivate: [ProfileGuard] },
+  { path: 'sections', component: SlideWalkerComponent, canActivate: [ProfileGuard] },
   { path: '', component: HomeComponent, canActivate: [ProfileGuard] },
   { path: '**', component: HomeComponent, canActivate: [ProfileGuard] }
 ];
@@ -143,7 +145,9 @@ const appRoutes: Routes = [
     /**
      * primeface
      */
+    OverlayPanelModule,
     SidebarModule,
+    MatSliderModule,
     CarouselModule,
     DataTableModule,
     SharedModule,
@@ -188,9 +192,8 @@ const appRoutes: Routes = [
      * store
      */
     StoreModule.forRoot({
-      slide: SlideStoreService.reducer,
       slides: SlidesStoreService.reducer,
-      folder: FolderStoreService.reducer
+      folders: FoldersStoreService.reducer
     })
   ],
   providers: [
@@ -201,22 +204,21 @@ const appRoutes: Routes = [
     /**
      * stores
      */
-    FolderStoreService,
-    SlideStoreService,
+    FoldersStoreService,
     SlidesStoreService,
     ConfigurationService,
     DataSlidesService,
+    DataFoldersService,
     DataStoreService,
     SecurityService,
     WindowService,
-    LoggerService
+    LoggerService,
+    ConfirmationService
   ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
   public static metareducer(state: any, action: any): any {
-    console.log('state', state);
-    console.log('action', action);
     return state;
   }
 }

@@ -1,3 +1,14 @@
+<p-toolbar>
+    <div class="ui-toolbar-group-left">
+        <button pButton type="button" icon="fa-plus" (click)="onCreate($event)"></button>
+        <button pButton type="button" icon="fa-copy" (click)="onDuplicate($event)"></button>
+        <button pButton type="button" icon="fa-trash" (click)="onDelete($event)"></button>
+        <i class="fa fa-bars"></i>
+        <button pButton type="button" icon="fa-save" (click)="onSave()"></button>
+        <button pButton type="button" icon="fa-chevron-left" (click)="onPrev()"></button>
+        <button pButton type="button" icon="fa-chevron-right" (click)="onNext()"></button>
+    </div>
+</p-toolbar>
 <div *ngIf="slide" class="ui-g ui-fluid">
   <div class="ui-g-12 ui-sm-12">
     <div class="ui-inputgroup">
@@ -11,6 +22,12 @@
         <i class="fa fa-time"></i>
       </span>
       <input type="text" [(ngModel)]="slide.timestamp" pInputText placeholder="Dernière mise à jour" disabled>
+    </div>
+    <div class="ui-inputgroup">
+      <span class="ui-inputgroup-addon">
+        <i class="fa fa-sort"></i>
+      </span>
+      <input type="text" [(ngModel)]="slide.order" pInputText placeholder="0">
     </div>
     <div class="ui-inputgroup">
       <span class="ui-inputgroup-addon">

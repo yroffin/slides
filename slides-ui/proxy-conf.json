@@ -1,10 +1,10 @@
 {
     "/api": {
-       "target": "http://192.168.1.53:3000",
+       "target": "http://localhost:3000",
        "secure": false
     },
     "/oauth2": {
-       "target": "http://192.168.1.53:3000",
+       "target": "http://localhost:3000",
        "secure": false
     }
  }

@@ -17,7 +17,12 @@
 import { EntityBean } from './entity-bean';
 import { SlideBean } from './slide-bean';
 
+export class FolderElementBean {
+    reference: string;
+    children: Array<FolderElementBean>;
+}
+
 export class FolderBean extends EntityBean {
     name: string;
-    slides: Array<SlideBean>;
+    children: Array<FolderElementBean>;
 }

@@ -1,7 +1,63 @@
-<button mat-button (click)="viewFolder()">view</button>
-<p-treeTable [value]="items" selectionMode="single" [(selection)]="selectedSlides" (onNodeSelect)="selectSlide($event)">
-  <p-header>Slides</p-header>
-  <p-column field="id" header="id"></p-column>
-  <p-column field="name" header="Name"></p-column>
-  <p-column field="type" header="Type"></p-column>
-</p-treeTable>
+<p-toolbar>
+    <div class="ui-toolbar-group-left">
+        <button pButton type="button" icon="fa-trash-o" (click)="confirmOnDrop(folder)"></button>
+        <i class="fa fa-bars"></i>
+        <button pButton type="button" icon="fa-save" (click)="onSave(folder)"></button>
+        <button pButton type="button" icon="fa-eye" (click)="onView(folder)"></button>
+    </div>
+</p-toolbar>
+<div *ngIf="folder" class="ui-g ui-fluid">
+    <div class="ui-g-12 ui-sm-12">
+        <div class="ui-inputgroup">
+            <span class="ui-inputgroup-addon">
+                <i class="fa fa-tag"></i>
+            </span>
+            <input type="text" [(ngModel)]="folder.id" pInputText placeholder="Id." disabled>
+        </div>
+        <div class="ui-inputgroup">
+            <span class="ui-inputgroup-addon">
+                <i class="fa fa-time"></i>
+            </span>
+            <input type="text" [(ngModel)]="folder.timestamp" pInputText placeholder="Dernière mise à jour" disabled>
+        </div>
+        <div class="ui-inputgroup">
+            <span class="ui-inputgroup-addon">
+                <i class="fa fa-sort"></i>
+            </span>
+            <input type="text" [(ngModel)]="folder.order" pInputText placeholder="0">
+        </div>
+        <div class="ui-inputgroup">
+            <span class="ui-inputgroup-addon">
+                <i class="fa fa-file-powerpoint-o"></i>
+            </span>
+            <input type="text" [(ngModel)]="folder.name" pInputText placeholder="Title">
+        </div>
+    </div>
+</div>
+<table>
+    <tr>
+        <td>
+            <mat-slider thumbLabel [(ngModel)]="scrollx" (change)="scrollXChange($event)" min="0" max="4096" step="1" value="0"></mat-slider>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <svg id="svg" width="800" height="600"></svg>
+        </td>
+        <td>
+            <div>
+                <mat-slider thumbLabel class="align-vertical-top" [(ngModel)]="scrolly" (change)="scrollYChange($event)" min="0" max="4096"
+                    step="1" value="0" vertical invert></mat-slider>
+            </div>
+        </td>
+    </tr>
+</table>
+<p-dialog modal="true" header="Title" [(visible)]="display">
+    <p-dataTable *ngIf="slides" [value]="slides" (onRowClick)="onSlideChangeHandler($event.data)" selectionMode="single" filter="true"
+        filterPlaceholder="Rechercher" header="Slide" sortField="order" sortable="true" [rows]="10" [paginator]="true">
+        <p-column field="id" header="Id."></p-column>
+        <p-column field="name" header="Nom"></p-column>
+    </p-dataTable>
+</p-dialog>
+<p-confirmDialog header="Confirmation" icon="fa fa-question-circle" width="425">
+</p-confirmDialog>
