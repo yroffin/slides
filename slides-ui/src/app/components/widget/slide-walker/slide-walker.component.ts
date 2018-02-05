@@ -139,7 +139,6 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
    * ngInit handler
    */
   ngOnInit() {
-    this.logger.info("Init slide walker", this.snap)
     this.snap = Snap("#svg").attr({
       viewBox: "0 0 800 600",
       style: 'stroke-width: 5px; background-color: grey;'

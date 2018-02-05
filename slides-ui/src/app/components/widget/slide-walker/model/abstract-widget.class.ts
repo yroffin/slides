@@ -144,13 +144,29 @@ export class AbstractWidget implements WidgetInterface {
   /**
    * add a new selector
    */
-  protected addSelector(name: string): void {
-    this.selector.set(name, this.snap.circle(0, 0, 10).attr({
+  protected addSelector(name: string, awesome: string): void {
+    let group = this.snap.group().attr({
+      style: "font-family: FontAwesome; font-size: 12; cursor: pointer",
+      display: "none"
+    });
+    this.selector.set(name, group);
+    let circle = this.snap.circle(0, 0, 10).attr({
       fill: "red",
       stroke: "#000",
       strokeWidth: 3,
-      display: "none"
-    }));
+      display: ""
+    });
+    group.add(circle);
+    let text = this.snap.text(0, 0, awesome).attr({
+      fill: "white",
+      display: ""
+    });
+    text.attr({
+      x: -text.getBBox().w/2,
+      y: text.getBBox().h/5,
+    })
+    group.add(text);
+    // group this selector
     this.group.append(this.selector.get(name));
   }
 
@@ -161,9 +177,9 @@ export class AbstractWidget implements WidgetInterface {
     this.group = this.snap.group();
     this.anc = Snap.set();
     // Lets create big circle in the middle
-    this.addSelector("add");
-    this.addSelector("drop");
-    this.addSelector("add-child");
+    this.addSelector("add", '\uf0fe');
+    this.addSelector("drop", '\uf1f8');
+    this.addSelector("add-child", '\uf0e8');
     // drag callback
     let dragData: any;
 
@@ -213,9 +229,12 @@ export class AbstractWidget implements WidgetInterface {
         let selectors = this.selector.size;
         let index = 0;
         this.selector.forEach((value: any, key: string) => {
+          this.moveTo(
+            value,
+            (this.anc.getBBox().width / 2) + Math.cos(Math.PI / selectors * index) * circle,
+            (this.anc.getBBox().height / 2) + Math.sin(Math.PI / selectors * index) * circle
+          );
           value.attr({
-            cx: (this.anc.getBBox().width / 2) + Math.cos(Math.PI / selectors * index) * circle,
-            cy: (this.anc.getBBox().height / 2) + Math.sin(Math.PI / selectors * index) * circle,
             display: ""
           });
           index ++;
