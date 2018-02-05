@@ -43,13 +43,15 @@ import { StartWidget } from './model/start-widget.class';
 import { WidgetInterface, AbstractWidget } from './model/abstract-widget.class';
 import { DataFoldersService } from '../../../services/data-folders.service';
 import { ConfirmationService } from 'primeng/components/common/confirmationservice';
+import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
+import { ISubscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-slide-walker',
   templateUrl: './slide-walker.component.html',
   styleUrls: ['./slide-walker.component.css']
 })
-export class SlideWalkerComponent implements OnInit {
+export class SlideWalkerComponent implements OnInit, OnDestroy {
 
   /**
    * internal member for viewbox
@@ -69,6 +71,8 @@ export class SlideWalkerComponent implements OnInit {
 
   protected display: boolean = false;
   protected callback: (slide: SlideBean) => void;
+
+  private subscriptions: Array<ISubscription> = new Array<ISubscription>();
 
   /**
    * internal streams and store
@@ -102,39 +106,40 @@ export class SlideWalkerComponent implements OnInit {
      */
     this.slidesStream = this.slidesStoreService.slides();
 
-    this.slidesStream.subscribe(
+    this.subscriptions.push(this.slidesStream.subscribe(
       (elements: SlideBean[]) => {
         this.slides = elements;
       },
       error => {
-        console.error(error);
+        this.logger.error(error);
       },
       () => {
       }
-    );
+    ));
 
     /**
      * subscribe
      */
     this.folderStream = this.foldersStoreService.folder();
 
-    this.folderStream.subscribe(
+    this.subscriptions.push(this.folderStream.subscribe(
       (element: FolderBean) => {
         this.folder = element;
         this.reload(this.folder);
       },
       error => {
-        console.error(error);
+        this.logger.error(error);
       },
       () => {
       }
-    );
+    ));
   }
 
   /**
    * ngInit handler
    */
   ngOnInit() {
+    this.logger.info("Init slide walker", this.snap)
     this.snap = Snap("#svg").attr({
       viewBox: "0 0 800 600",
       style: 'stroke-width: 5px; background-color: grey;'
@@ -142,6 +147,15 @@ export class SlideWalkerComponent implements OnInit {
 
     // fix desk drag and move handler
     this.dragAndMove();
+  }
+
+  /**
+   * ngDestroy
+   */
+  ngOnDestroy() {
+    _.each(this.subscriptions, (sub: ISubscription) => {
+      sub.unsubscribe();
+    });
   }
 
   /**

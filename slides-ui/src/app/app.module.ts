@@ -102,6 +102,9 @@ import { SlideBrowserComponent } from './components/widget/slide-browser/slide-b
 import { SlidesStoreService } from './stores/slides-store.service';
 import { FoldersStoreService } from './stores/folders-store.service';
 import { DataFoldersService } from './services/data-folders.service';
+import { RouteReuseStrategy, DetachedRouteHandle } from '@angular/router';
+import { ActivatedRouteSnapshot } from '@angular/router';
+import { CustomRouteReuseStrategyService } from './services/custom-route-reuse-strategy.service';
 
 /**
  * default route definition
@@ -197,6 +200,10 @@ const appRoutes: Routes = [
     })
   ],
   providers: [
+    {
+      provide: RouteReuseStrategy,
+      useClass: CustomRouteReuseStrategyService
+    },
     /**
      * guards
      */
