@@ -41,6 +41,12 @@ export class FolderLink {
   folderElement: FolderElementBean;
 }
 
+export class FolderChildLink {
+  id: string;
+  folder: FolderBean;
+  folderElement: FolderElementBean;
+}
+
 /**
  * actions
  */
@@ -59,6 +65,16 @@ export class InsertFolderAction implements ActionWithPayload<FolderLink> {
   constructor(public payload: FolderLink) { }
 }
 
+export class AppendChildFolderAction implements ActionWithPayload<FolderLink> {
+  readonly type = 'AppendChildFolderAction';
+  constructor(public payload: FolderChildLink) { }
+}
+
+export class InsertChildFolderAction implements ActionWithPayload<FolderLink> {
+  readonly type = 'InsertChildFolderAction';
+  constructor(public payload: FolderChildLink) { }
+}
+
 export class DeleteFolderAction implements ActionWithPayload<FolderBean> {
   readonly type = 'DeleteFolderAction';
   constructor(public payload: FolderBean) { }
@@ -74,7 +90,7 @@ export class SelectFolderAction implements ActionWithPayload<FolderBean> {
   constructor(public payload: FolderBean) { }
 }
 
-export type AllFoldersActions = LoadFoldersAction | AddFolderAction | DeleteFolderAction | SelectFolderAction | InsertFolderAction | UpdateFolderAction;
+export type AllFoldersActions = LoadFoldersAction | AddFolderAction | DeleteFolderAction | SelectFolderAction | InsertFolderAction | UpdateFolderAction | AppendChildFolderAction | InsertChildFolderAction;
 
 /**
  * main store for this application
@@ -163,6 +179,46 @@ export class FoldersStoreService {
             if (element.id === action.payload.folder.id) {
               folder = Object.assign({}, element);
               element.children.splice(0, 0, action.payload.folderElement);
+            }
+          });
+          return {
+            folders: folders,
+            folder: folder
+          };
+        }
+
+      case 'AppendChildFolderAction':
+        {
+          let folders = Object.assign([], state.folders);
+          let folder;
+          _.each(folders, (element: FolderBean) => {
+            if (element.id === action.payload.folder.id) {
+              folder = Object.assign({}, element);
+              _.each(element.children, (child: FolderBean) => {
+                if (child.id === action.payload.id) {
+                  child.children.splice(0, 0, action.payload.folderElement);
+                }
+              });
+            }
+          });
+          return {
+            folders: folders,
+            folder: folder
+          };
+        }
+
+      case 'InsertChildFolderAction':
+        {
+          let folders = Object.assign([], state.folders);
+          let folder;
+          _.each(folders, (element: FolderBean) => {
+            if (element.id === action.payload.folder.id) {
+              folder = Object.assign({}, element);
+              _.each(element.children, (child: FolderBean) => {
+                if (child.id === action.payload.id) {
+                  child.children.push(action.payload.folderElement);
+                }
+              });
             }
           });
           return {

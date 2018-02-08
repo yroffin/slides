@@ -20,14 +20,14 @@ declare var mina: any;
 
 import * as _ from 'lodash';
 import { ConnectorWidget } from './connector-widget.class';
-import { AbstractWidget, WidgetInterface } from './abstract-widget.class';
+import { AbstractWidget, WidgetInterface, WidgetAction } from './abstract-widget.class';
 
 export class StartWidget extends AbstractWidget {
 
   private circle_1: any;
   private circle_2: any;
 
-  constructor(guid: string, s: any, label: string, callback: (widget: WidgetInterface, action: string) => void) {
+  constructor(guid: string, s: any, label: string, callback: (widget: WidgetInterface, action: WidgetAction) => void) {
     super(guid, s, label, callback);
     this.init();
     // on click callback
@@ -54,9 +54,9 @@ export class StartWidget extends AbstractWidget {
       stroke: "#000"
     });
 
-    this.group.prepend(this.circle_1)
-    this.group.prepend(this.circle_2)
+    this.widget.prepend(this.circle_1)
+    this.widget.prepend(this.circle_2)
     this.anchor(this.circle_1);
-    return this.group;
+    return this.widget;
   }
 }

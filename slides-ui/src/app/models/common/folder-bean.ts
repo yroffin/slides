@@ -18,6 +18,7 @@ import { EntityBean } from './entity-bean';
 import { SlideBean } from './slide-bean';
 
 export class FolderElementBean {
+    id: string;
     reference: string;
     children: Array<FolderElementBean>;
 }

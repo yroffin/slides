@@ -20,7 +20,7 @@ declare var mina: any;
 
 import * as _ from 'lodash';
 import { ConnectorWidget } from './connector-widget.class';
-import { AbstractWidget, WidgetInterface } from './abstract-widget.class';
+import { AbstractWidget, WidgetInterface, WidgetAction } from './abstract-widget.class';
 
 export class SlideWidget extends AbstractWidget {
 
@@ -36,7 +36,7 @@ export class SlideWidget extends AbstractWidget {
    * @param label 
    * @param callback 
    */
-  constructor(guid: string, target: string, s: any, label: string, callback: (widget: WidgetInterface, action: string) => void) {
+  constructor(guid: string, target: string, s: any, label: string, callback: (widget: WidgetInterface, action: WidgetAction) => void) {
     super(guid, s, label, callback);
     this.target = target;
     this.init();
@@ -67,13 +67,17 @@ export class SlideWidget extends AbstractWidget {
     });
 
     // text area
-    this.text = this.snap.text(10, 10, this.label).attr({
+    this.text = this.snap.text(10, 10, this.guid).attr({
+      fontSize: 8
+    });
+    let alt = this.snap.text(10, 20, "reference: " + this.label).attr({
       fontSize: 8
     });
 
-    this.group.prepend(this.rect)
-    this.group.append(this.text);
+    this.widget.prepend(this.rect)
+    this.widget.append(this.text);
+    this.widget.append(alt);
     this.anchor(this.rect);
-    return this.group;
+    return this.widget;
   }
 }

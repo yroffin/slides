@@ -30,6 +30,12 @@ export class Direction {
   public getLabel(): string {
     return this.NS+this.EW;
   }
+  public getNS(): string {
+    return this.NS;
+  }
+  public getEW(): string {
+    return this.EW;
+  }
 }
 
 /**

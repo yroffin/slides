@@ -38,9 +38,9 @@ import { ConnectorWidget } from './model/connector-widget.class';
 import { SlideWidget } from './model/slide-widget.class';
 import { SlideEntry } from './model/slide-entry.class';
 import { SlidesStoreService } from '../../../stores/slides-store.service';
-import { FoldersStoreService, LoadFoldersAction, AddFolderAction, DeleteFolderAction, InsertFolderAction, UpdateFolderAction } from '../../../stores/folders-store.service';
+import { FoldersStoreService, LoadFoldersAction, AddFolderAction, DeleteFolderAction, InsertFolderAction, UpdateFolderAction, AppendChildFolderAction } from '../../../stores/folders-store.service';
 import { StartWidget } from './model/start-widget.class';
-import { WidgetInterface, AbstractWidget } from './model/abstract-widget.class';
+import { WidgetInterface, AbstractWidget, WidgetAction } from './model/abstract-widget.class';
 import { DataFoldersService } from '../../../services/data-folders.service';
 import { ConfirmationService } from 'primeng/components/common/confirmationservice';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
@@ -62,6 +62,7 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
   private viewy: number = 0;
   private vieww: number = 800;
   private viewh: number = 600;
+  private start: any;
 
   /**
    * internal streams and store
@@ -158,6 +159,34 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * update viewport
+   */
+  private updateViewPort(scrollx: number, scrolly: number) {
+    this.scrollx = scrollx;
+    this.scrolly = scrolly;
+    this.viewx = this.scrollx;
+    this.viewy = this.scrolly;
+    let viewport = this.viewx + " " + this.viewy + " " + this.vieww + " " + this.viewh;
+    this.snap.attr({
+      viewBox: viewport
+    });
+  }
+
+  /**
+   * scrollbar
+   */
+  private scrollXChange(event) {
+    this.updateViewPort(event.value, this.scrolly);
+  }
+
+  /**
+   * scrollbar
+   */
+  private scrollYChange(event) {
+    this.updateViewPort(this.scrolly, event.value);
+  }
+
+  /**
    * desktop drag handler
    */
   private dragAndMove() {
@@ -182,14 +211,7 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
         let dx = event.clientX - dragData.dx;
         let dy = event.clientY - dragData.dy;
         if (AbstractWidget.canDrag) {
-          this.scrollx = dragData.scrollx + dx;
-          this.scrolly = dragData.scrolly + dy;
-          this.viewx = this.scrollx;
-          this.viewy = this.scrolly;
-          let viewport = this.viewx + " " + this.viewy + " " + this.vieww + " " + this.viewh;
-          this.snap.attr({
-            viewBox: viewport
-          });
+          this.updateViewPort(dragData.scrollx + dx, dragData.scrolly + dy);
         }
       }
     });
@@ -221,19 +243,36 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
    * @param from 
    * @param to 
    */
-  private connect(from: WidgetInterface, to: WidgetInterface) {
+  private connectLeftRight(from: WidgetInterface, to: WidgetInterface) {
     // create a new connector
     let connector = new ConnectorWidget(this.newGuid(), this.snap, "", (widget: WidgetInterface) => {
     });
     this.connectors.push(connector);
-    from.addStart(connector);
-    to.addEnd(connector);
+    from.addOnTheRight(connector);
+    to.addOnTheLeft(connector);
+    connector.after(from);
+    connector.after(to);
+  }
+
+  /**
+   * connect
+   * @param from 
+   * @param to 
+   */
+  private connectTopBottom(from: WidgetInterface, to: WidgetInterface) {
+    // create a new connector
+    let connector = new ConnectorWidget(this.newGuid(), this.snap, "", (widget: WidgetInterface) => {
+    });
+    this.connectors.push(connector);
+    from.addOnTheTop(connector);
+    to.addOnTheBottom(connector);
     connector.after(from);
     connector.after(to);
   }
 
   /**
    * reload world
+   * @param folder 
    */
   private reload(folder: FolderBean) {
     if (!this.snap) return;
@@ -243,10 +282,11 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
     this.connectors = new Array<ConnectorWidget>();
 
     // declare start
-    let start = new StartWidget(this.newGuid(), this.snap, "start", (widget: WidgetInterface, action: string) => {
-      if (action === "add") {
+    this.start = new StartWidget(this.newGuid(), this.snap, "start", (widget: WidgetInterface, link: WidgetAction) => {
+      if (link.action === "add") {
         this.selectSlide((slide: SlideBean) => {
           let folderElement: FolderElementBean = {
+            id: this.newGuid(),
             reference: slide.id,
             children: new Array<FolderElementBean>()
           };
@@ -254,59 +294,117 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
         });
       }
     });
-    start.move(25, 25);
+    this.start.move(25, 25);
 
-    this.widgets.set(start.getGuid(), start);
+    this.widgets.set(this.start.getGuid(), this.start);
 
     // build all widget based on folders
-    let previous = start.getGuid();
-    _.each(folder.children, (folderElement: FolderElementBean) => {
-      let widget = new SlideWidget(this.newGuid(), folderElement.reference, this.snap, folderElement.reference, (widget: WidgetInterface, action: string) => {
-        if (action === "add") {
+    this.reloadChild(this.start, folder.children);
+
+    // build all connectors
+    this.reloadConnectors(this.start, folder.children, true);
+
+    // dispose all widgets
+    this.dispose(0, 20, 50, this.start, folder.children, true);
+  }
+
+  /**
+   * dispose widgets
+   * @param start 
+   * @param folderElements 
+   */
+  private dispose(level: number, x: number, y: number, start: WidgetInterface, folderElements: FolderElementBean[], order: boolean) {
+    if (level === 0) {
+      start.move(x, y);
+      x += 100;
+    }
+    _.each(folderElements, (folderElement: FolderElementBean) => {
+      let widget: WidgetInterface = this.widgets.get(folderElement.id);
+      widget.move(x, y);
+      // scan children
+      if (folderElement.children) {
+        this.dispose(level + 1, x, y + 150, widget, folderElement.children, false);
+      }
+      if(order) x += 200;
+      else y += 150;
+    });
+    // update start
+    start.update();
+    // update all connectors
+    _.each(folderElements, (folderElement: FolderElementBean) => {
+      let widget: WidgetInterface = this.widgets.get(folderElement.id);
+      widget.update();
+    });
+  }
+
+  /**
+   * load connectors
+   * @param start 
+   * @param folderElements 
+   */
+  private reloadConnectors(start: WidgetInterface, folderElements: FolderElementBean[], order: boolean) {
+    let last = null;
+    _.each(folderElements, (folderElement: FolderElementBean) => {
+      let widget: WidgetInterface = this.widgets.get(folderElement.id);
+      if (last === null) {
+        if(order) {
+          this.connectLeftRight(start, widget);
+        } else {
+          this.connectTopBottom(start, widget);
+        }
+      } else {
+        if(order) {
+          this.connectLeftRight(last, widget);
+        } else {
+          this.connectTopBottom(last, widget);
+        }
+      }
+      last = widget;
+      // scan children
+      if (folderElement.children) {
+        this.reloadConnectors(widget, folderElement.children, false);
+      }
+    });
+  }
+
+  /**
+   * reload all child
+   * @param start 
+   * @param folderElements 
+   */
+  private reloadChild(start: AbstractWidget, folderElements: FolderElementBean[]) {
+    let previous = start;
+    _.each(folderElements, (folderElement: FolderElementBean) => {
+      // map folder element id, and create new one if empty
+      if (!folderElement.id || folderElement.id === "") {
+        folderElement.id = this.newGuid();
+      }
+      let widget = new SlideWidget(folderElement.id, folderElement.reference, this.snap, folderElement.reference, (widget: WidgetInterface, link: WidgetAction) => {
+        if (link.action === "add") {
           this.selectSlide((slide: SlideBean) => {
             let folderElement: FolderElementBean = {
+              id: this.newGuid(),
               reference: slide.id,
               children: new Array<FolderElementBean>()
             };
             this.foldersStoreService.dispatch(new InsertFolderAction({ folder: this.folder, folderElement: folderElement }));
           });
         }
-        if (action === "add-child") {
+        if (link.action === "add-child") {
           this.selectSlide((slide: SlideBean) => {
             let folderElement: FolderElementBean = {
+              id: this.newGuid(),
               reference: slide.id,
               children: new Array<FolderElementBean>()
             };
-            this.foldersStoreService.dispatch(new InsertFolderAction({ folder: this.folder, folderElement: folderElement }));
+            this.foldersStoreService.dispatch(new AppendChildFolderAction({ id: link.id, folder: this.folder, folderElement: folderElement }));
           });
         }
       });
-      widget.setPrev(previous);
-      previous = widget.getGuid();
+      widget.setPrev(previous.getGuid());
+      previous = widget;
       this.widgets.set(widget.getGuid(), widget);
-    });
-
-    // compute connectors
-    // iterate on each slides
-    this.widgets.forEach((widget: WidgetInterface, key) => {
-      if (widget.getPrev()) {
-        this.connect(this.widgets.get(widget.getPrev()), widget)
-      }
-      if (!widget.getPrev() && widget.getGuid() != start.getGuid()) {
-        this.connect(start, widget)
-      }
-    });
-
-    let x = 5;
-    // compute connectors
-    // iterate on each slides
-    this.widgets.forEach((widget: WidgetInterface, key) => {
-      x += 200;
-      widget.move(x, 100);
-    });
-
-    this.widgets.forEach((widget: WidgetInterface, key) => {
-      widget.update();
+      this.reloadChild(widget, folderElement.children);
     });
   }
 
@@ -363,6 +461,15 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
    */
   protected onView(folder: FolderBean) {
     window.open("/api/presentation/" + folder.id, "_blank");
+  }
+
+  /**
+   * view folder
+   * @param folder 
+   */
+  protected onDispose(start: any, folder: FolderBean) {
+    // dispose all widgets
+    this.dispose(0, 20, 50, start, folder.children, true);
   }
 
   /**

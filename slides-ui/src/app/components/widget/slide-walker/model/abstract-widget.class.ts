@@ -29,11 +29,21 @@ export interface WidgetInterface {
   getGuid(): string
   getPrev(): string
   setPrev(guid: string)
-  addStart(connector: ConnectorWidget)
-  addEnd(connector: ConnectorWidget)
+  addOnTheRight(connector: ConnectorWidget)
+  addOnTheLeft(connector: ConnectorWidget)
+  addOnTheTop(connector: ConnectorWidget)
+  addOnTheBottom(connector: ConnectorWidget)
   getElements(): any[]
   move(dx: number, dy: number)
   update()
+}
+
+/**
+ * abstract WidgetAction
+ */
+export class WidgetAction {
+  action: string;
+  id: string;
 }
 
 /**
@@ -50,15 +60,17 @@ export class AbstractWidget implements WidgetInterface {
   private debug: any;
 
   // start and end connector
-  private starts: ConnectorWidget[] = new Array<ConnectorWidget>();
-  private ends: ConnectorWidget[] = new Array<ConnectorWidget>();
+  private onTheRights: ConnectorWidget[] = new Array<ConnectorWidget>();
+  private onTheLefts: ConnectorWidget[] = new Array<ConnectorWidget>();
+  private onTheTops: ConnectorWidget[] = new Array<ConnectorWidget>();
+  private onTheBottoms: ConnectorWidget[] = new Array<ConnectorWidget>();
 
   private selector: Map<string, any> = new Map<string, any>();
   protected onDrag: () => void
-  protected onClick: (widget: WidgetInterface, name: string) => void
+  protected onClick: (widget: WidgetInterface, name: WidgetAction) => void
 
   // global group and set
-  protected group: any;
+  protected widget: any;
   protected anc: any;
 
   protected prev: string;
@@ -71,7 +83,7 @@ export class AbstractWidget implements WidgetInterface {
    * @param label 
    * @param callback with action string (add, drop ...)
    */
-  constructor(guid: string, s: any, label: string, callback: (widget: WidgetInterface, action: string) => void) {
+  constructor(guid: string, s: any, label: string, callback: (widget: WidgetInterface, action: WidgetAction) => void) {
     this.guid = guid;
     this.label = label;
     this.snap = s;
@@ -166,15 +178,15 @@ export class AbstractWidget implements WidgetInterface {
       y: text.getBBox().h/5,
     })
     group.add(text);
-    // group this selector
-    this.group.append(this.selector.get(name));
+    // widget this selector
+    this.widget.append(this.selector.get(name));
   }
 
   /**
    * init this widget
    */
   protected init(): any {
-    this.group = this.snap.group();
+    this.widget = this.snap.group();
     this.anc = Snap.set();
     // Lets create big circle in the middle
     this.addSelector("add", '\uf0fe');
@@ -184,10 +196,10 @@ export class AbstractWidget implements WidgetInterface {
     let dragData: any;
 
     // drag handler
-    this.group.drag(
+    this.widget.drag(
       // move
       (dx, dy) => {
-        this.group.attr({
+        this.widget.attr({
           transform: dragData + (dragData ? "T" : "t") + [dx, dy]
         });
         this.updateConnectors()
@@ -198,7 +210,7 @@ export class AbstractWidget implements WidgetInterface {
       // start
       () => {
         AbstractWidget.canDrag = false;
-        dragData = this.group.transform().local;
+        dragData = this.widget.transform().local;
       },
       // end
       () => {
@@ -213,18 +225,18 @@ export class AbstractWidget implements WidgetInterface {
     this.selector.forEach((value: any, key: string) => {
       value.click((event) => {
         if (this.onClick) {
-          this.onClick(this, key)
+          this.onClick(this, {action: key, id: this.guid})
         }
       });
     });
 
-    this.elements.push(this.group);
+    this.elements.push(this.widget);
 
     // hover callback when mouse is over the
     // main group
-    this.group.hover(
+    this.widget.hover(
       () => {
-        this.group.attr({ filter: this.snap.filter(Snap.filter.shadow(2, 1, 1)) });
+        this.widget.attr({ filter: this.snap.filter(Snap.filter.shadow(2, 1, 1)) });
         let circle = 20;
         let selectors = this.selector.size;
         let index = 0;
@@ -241,31 +253,49 @@ export class AbstractWidget implements WidgetInterface {
         });
       },
       () => {
-        this.group.attr({ filter: null });
+        this.widget.attr({ filter: null });
         this.selector.forEach((value: any, key: string) => {
           value.attr({
             display: "none"
           });
         });
       })
-    return this.group;
+    return this.widget;
   }
 
   /**
-   * fix start connector
+   * fix connector
    * @param connector 
    */
-  public addStart(connector: ConnectorWidget) {
-    this.starts.push(connector);
+  public addOnTheRight(connector: ConnectorWidget) {
+    this.onTheRights.push(connector);
     this.updateConnectors()
   }
 
   /**
-   * fix end connector
+   * fix connector
    * @param connector 
    */
-  public addEnd(connector: ConnectorWidget) {
-    this.ends.push(connector);
+  public addOnTheLeft(connector: ConnectorWidget) {
+    this.onTheLefts.push(connector);
+    this.updateConnectors()
+  }
+
+  /**
+   * fix connector
+   * @param connector 
+   */
+  public addOnTheTop(connector: ConnectorWidget) {
+    this.onTheTops.push(connector);
+    this.updateConnectors()
+  }
+
+  /**
+   * fix connector
+   * @param connector 
+   */
+  public addOnTheBottom(connector: ConnectorWidget) {
+    this.onTheBottoms.push(connector);
     this.updateConnectors()
   }
 
@@ -273,12 +303,12 @@ export class AbstractWidget implements WidgetInterface {
    * display debug information
    */
   protected refreshDebug() {
-    let debug = this.group.getBBox().x + " x " + this.group.getBBox().y + "\n tx " + this.group.transform();
+    let debug = this.widget.getBBox().x + " x " + this.widget.getBBox().y + "\n tx " + this.widget.transform();
     if (this.debug) this.debug.remove();
     this.debug = this.snap.text(10, 90, debug).attr({
       fontSize: 8
     });
-    this.group.add(this.debug);
+    this.widget.add(this.debug);
   }
 
   /**
@@ -286,21 +316,39 @@ export class AbstractWidget implements WidgetInterface {
    */
   private updateConnectors() {
     // draw each line to start connectors
-    _.each(this.starts, (connector: ConnectorWidget) => {
+    _.each(this.onTheRights, (connector: ConnectorWidget) => {
       let direction = connector.direction();
-      if (direction.getLabel() === 'NE' || direction.getLabel() === 'SE') {
-        connector.setStart(this.group.getBBox().x + this.group.getBBox().width, this.group.getBBox().cy);
+      if (direction.getEW() === 'E') {
+        connector.setStart(this.widget.getBBox().x + this.widget.getBBox().width, this.widget.getBBox().cy);
       } else {
-        connector.setStart(this.group.getBBox().x, this.group.getBBox().cy);
+        connector.setStart(this.widget.getBBox().x, this.widget.getBBox().cy);
       }
     })
     // draw each line to end connectors
-    _.each(this.ends, (connector: ConnectorWidget) => {
+    _.each(this.onTheLefts, (connector: ConnectorWidget) => {
       let direction = connector.direction();
-      if (direction.getLabel() === 'NE' || direction.getLabel() === 'SE') {
-        connector.setEnd(this.group.getBBox().x, this.group.getBBox().cy);
+      if (direction.getEW() === 'W') {
+        connector.setEnd(this.widget.getBBox().x + this.widget.getBBox().width, this.widget.getBBox().cy);
       } else {
-        connector.setEnd(this.group.getBBox().x + this.group.getBBox().width, this.group.getBBox().cy);
+        connector.setEnd(this.widget.getBBox().x, this.widget.getBBox().cy);
+      }
+    })
+    // draw each line to start connectors
+    _.each(this.onTheTops, (connector: ConnectorWidget) => {
+      let direction = connector.direction();
+      if (direction.getNS() === 'S') {
+        connector.setStart(this.widget.getBBox().cx, this.widget.getBBox().y + this.widget.getBBox().height);
+      } else {
+        connector.setStart(this.widget.getBBox().cx, this.widget.getBBox().y);
+      }
+    })
+    // draw each line to end connectors
+    _.each(this.onTheBottoms, (connector: ConnectorWidget) => {
+      let direction = connector.direction();
+      if (direction.getNS() === 'S') {
+        connector.setEnd(this.widget.getBBox().cx, this.widget.getBBox().y);
+      } else {
+        connector.setEnd(this.widget.getBBox().cx, this.widget.getBBox().y +this.widget.getBBox().height);
       }
     })
     // for debug draw text information about position
@@ -332,7 +380,7 @@ export class AbstractWidget implements WidgetInterface {
    * @param dy 
    */
   public move(dx: number, dy: number) {
-    this.moveTo(this.group, dx, dy);
+    this.moveTo(this.widget, dx, dy);
     this.updateConnectors()
   }
 }
