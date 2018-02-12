@@ -59,6 +59,16 @@ export class DataCoreResource<T extends EntityBean> implements DefaultResource<T
     /**
      * execute remote task on this resource
      */
+    public Tasks = (task: string, args: any): Observable<any> => {
+        this.headers.set('AuthToken', this.configuration.getAuthToken());
+        return this.http.post(this.actionUrl + '?task=' + task, JSON.stringify(args), { headers: this.headers })
+            .map((response: Response) => <any> response.json())
+            .catch(this.handleError);
+    }
+
+    /**
+     * execute remote task on this resource
+     */
     public Task = (id: string, task: string, args: any): Observable<any> => {
         this.headers.set('AuthToken', this.configuration.getAuthToken());
         return this.http.post(this.actionUrl + '/' + id + '?task=' + task, JSON.stringify(args), { headers: this.headers })

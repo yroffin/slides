@@ -325,7 +325,7 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
       if (folderElement.children) {
         this.dispose(level + 1, x, y + 150, widget, folderElement.children, false);
       }
-      if(order) x += 200;
+      if (order) x += 200;
       else y += 150;
     });
     // update start
@@ -347,13 +347,13 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
     _.each(folderElements, (folderElement: FolderElementBean) => {
       let widget: WidgetInterface = this.widgets.get(folderElement.id);
       if (last === null) {
-        if(order) {
+        if (order) {
           this.connectLeftRight(start, widget);
         } else {
           this.connectTopBottom(start, widget);
         }
       } else {
-        if(order) {
+        if (order) {
           this.connectLeftRight(last, widget);
         } else {
           this.connectTopBottom(last, widget);
@@ -486,6 +486,20 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
         this.foldersStoreService.dispatch(new DeleteFolderAction(
           folder
         ));
+      });
+  }
+
+  /**
+  * export all data
+  */
+  protected onExport() {
+    let exported
+    this.dataFoldersService.Tasks('export', {})
+      .subscribe(
+      (data: any) => exported = data,
+      error => this.logger.error("While exporting data", error),
+      () => {
+        console.log("task", exported)
       });
   }
 }
