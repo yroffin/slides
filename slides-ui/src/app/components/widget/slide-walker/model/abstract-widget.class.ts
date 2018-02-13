@@ -47,6 +47,18 @@ export class WidgetAction {
 }
 
 /**
+ * abstract WidgetBox
+ */
+export class WidgetBox {
+  x: number;
+  y: number;
+  cx: number;
+  cy: number;
+  width: number;
+  height: number;
+}
+
+/**
  * abstract widget
  */
 export class AbstractWidget implements WidgetInterface {
@@ -303,7 +315,7 @@ export class AbstractWidget implements WidgetInterface {
    * display debug information
    */
   protected refreshDebug() {
-    let debug = this.widget.getBBox().x + " x " + this.widget.getBBox().y + "\n tx " + this.widget.transform();
+    let debug = this.getBox().x + " x " + this.getBox().y + " * tx " + this.widget.transform();
     if (this.debug) this.debug.remove();
     this.debug = this.snap.text(10, 90, debug).attr({
       fontSize: 8
@@ -319,40 +331,56 @@ export class AbstractWidget implements WidgetInterface {
     _.each(this.onTheRights, (connector: ConnectorWidget) => {
       let direction = connector.direction();
       if (direction.getEW() === 'E') {
-        connector.setStart(this.widget.getBBox().x + this.widget.getBBox().width, this.widget.getBBox().cy);
+        connector.setStart(this.getBox().x + this.getBox().width, this.getBox().cy);
       } else {
-        connector.setStart(this.widget.getBBox().x, this.widget.getBBox().cy);
+        connector.setStart(this.getBox().x, this.getBox().cy);
       }
     })
     // draw each line to end connectors
     _.each(this.onTheLefts, (connector: ConnectorWidget) => {
       let direction = connector.direction();
       if (direction.getEW() === 'W') {
-        connector.setEnd(this.widget.getBBox().x + this.widget.getBBox().width, this.widget.getBBox().cy);
+        connector.setEnd(this.getBox().x + this.getBox().width, this.getBox().cy);
       } else {
-        connector.setEnd(this.widget.getBBox().x, this.widget.getBBox().cy);
+        connector.setEnd(this.getBox().x, this.getBox().cy);
       }
     })
     // draw each line to start connectors
     _.each(this.onTheTops, (connector: ConnectorWidget) => {
       let direction = connector.direction();
       if (direction.getNS() === 'S') {
-        connector.setStart(this.widget.getBBox().cx, this.widget.getBBox().y + this.widget.getBBox().height);
+        connector.setStart(this.getBox().cx, this.getBox().y + this.getBox().height);
       } else {
-        connector.setStart(this.widget.getBBox().cx, this.widget.getBBox().y);
+        connector.setStart(this.getBox().cx, this.getBox().y);
       }
     })
     // draw each line to end connectors
     _.each(this.onTheBottoms, (connector: ConnectorWidget) => {
       let direction = connector.direction();
       if (direction.getNS() === 'S') {
-        connector.setEnd(this.widget.getBBox().cx, this.widget.getBBox().y);
+        connector.setEnd(this.getBox().cx, this.getBox().y);
       } else {
-        connector.setEnd(this.widget.getBBox().cx, this.widget.getBBox().y +this.widget.getBBox().height);
+        connector.setEnd(this.getBox().cx, this.getBox().y +this.getBox().height);
       }
     })
     // for debug draw text information about position
     this.refreshDebug();
+  }
+
+  /**
+   * retrieve box area
+   */
+  public getBox(): WidgetBox {
+    let raw = this.widget.getBBox();
+    let box: WidgetBox = {
+      x: raw.x,
+      y: raw.y,
+      cx: raw.cx,
+      cy: raw.cy,
+      width: raw.width,
+      height: raw.height
+    }
+    return box
   }
 
   public getElements(): any[] {

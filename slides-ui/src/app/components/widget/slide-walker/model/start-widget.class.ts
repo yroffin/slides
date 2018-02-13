@@ -20,7 +20,7 @@ declare var mina: any;
 
 import * as _ from 'lodash';
 import { ConnectorWidget } from './connector-widget.class';
-import { AbstractWidget, WidgetInterface, WidgetAction } from './abstract-widget.class';
+import { AbstractWidget, WidgetInterface, WidgetAction, WidgetBox } from './abstract-widget.class';
 
 export class StartWidget extends AbstractWidget {
 
@@ -58,5 +58,18 @@ export class StartWidget extends AbstractWidget {
     this.widget.prepend(this.circle_2)
     this.anchor(this.circle_1);
     return this.widget;
+  }
+
+  /**
+   * retrieve box area
+   */
+  public getBox(): WidgetBox {
+    let box: WidgetBox = super.getBox();
+    box.width = 50;
+    box.height = 50;
+    box.cx = box.x + box.width / 2;
+    box.cy = box.y + box.height / 2;
+    console.log('log', box)
+    return box;
   }
 }
