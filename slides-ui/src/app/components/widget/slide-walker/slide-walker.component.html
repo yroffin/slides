@@ -10,6 +10,7 @@
         <button pButton type="button" icon="fa-download" (click)="onImport(folder)"></button>
     </div>
 </p-toolbar>
+<input #fileInput style="display:none" type="file" (change)="onChange($event)">
 <div *ngIf="folder" class="ui-g ui-fluid">
     <div class="ui-g-12 ui-sm-12">
         <div class="ui-inputgroup">

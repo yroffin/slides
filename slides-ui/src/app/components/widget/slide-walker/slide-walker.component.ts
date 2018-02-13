@@ -15,6 +15,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { Observable } from 'rxjs/Observable';
 import { State, Store } from '@ngrx/store';
 
@@ -45,6 +46,9 @@ import { DataFoldersService } from '../../../services/data-folders.service';
 import { ConfirmationService } from 'primeng/components/common/confirmationservice';
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { ISubscription } from 'rxjs/Subscription';
+import { ViewChild } from '@angular/core';
+import { ElementRef } from '@angular/core';
+import { Renderer } from '@angular/core';
 
 @Component({
   selector: 'app-slide-walker',
@@ -85,6 +89,8 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
   private connectors: Array<ConnectorWidget> = new Array<ConnectorWidget>();
   private widgets: Map<string, WidgetInterface> = new Map<string, WidgetInterface>();
 
+  @ViewChild('fileInput') fileInput: ElementRef;
+
   /**
    * constructor
    * @param folderStoreService 
@@ -95,6 +101,7 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
    * @param logger 
    */
   constructor(
+    private renderer: Renderer,
     private foldersStoreService: FoldersStoreService,
     private slidesStoreService: SlidesStoreService,
     private dataFoldersService: DataFoldersService,
@@ -298,14 +305,17 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
 
     this.widgets.set(this.start.getGuid(), this.start);
 
-    // build all widget based on folders
-    this.reloadChild(this.start, folder.children);
+    // check for null
+    if (folder) {
+      // build all widget based on folders
+      this.reloadChild(this.start, folder.children);
 
-    // build all connectors
-    this.reloadConnectors(this.start, folder.children, true);
+      // build all connectors
+      this.reloadConnectors(this.start, folder.children, true);
 
-    // dispose all widgets
-    this.dispose(0, 20, 50, this.start, folder.children, true);
+      // dispose all widgets
+      this.dispose(0, 20, 50, this.start, folder.children, true);
+    }
   }
 
   /**
@@ -500,6 +510,57 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
       error => this.logger.error("While exporting data", error),
       () => {
         console.log("task", exported)
+        /**
+         * TODO: compute locale
+         */
+        let datePipe = new DatePipe('en-US');
+        let fileName = 'export-' + datePipe.transform(new Date(), 'yyyyMMdd-HHmmss') + '.json';
+        let a: any = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        let file = new Blob([JSON.stringify(exported, null, 2)], { type: 'application/text' });
+        let fileURL = window.URL.createObjectURL(file);
+        a.href = fileURL;
+        a.download = fileName;
+        a.click();
+        //this.jarvisMessageService.push({ severity: 'info', summary: 'Téléchargement', detail: this.mySnapshot.name });
       });
+  }
+
+  /**
+  * export all data
+  */
+  protected onImport() {
+    let imported
+
+    let event = new MouseEvent('click', { bubbles: true });
+    this.renderer.invokeElementMethod(
+      this.fileInput.nativeElement, 'dispatchEvent', [event]);
+  }
+
+  /**
+   * onChange handler
+   * @param event 
+   */
+  public onChange(event): void {
+    let files = event.srcElement.files;
+
+    let that = this;
+    let myReader = new FileReader();
+
+    myReader.onloadend = (e) => {
+      let result
+      let imported = myReader.result;
+      console.log("task", e)
+      this.dataFoldersService.Tasks('import', JSON.parse(imported))
+        .subscribe(
+        (data: any) => result = data,
+        error => this.logger.error("While importing data", error),
+        () => {
+          console.log("task", result)
+        });
+    }
+
+    myReader.readAsText(files[0]);
   }
 }
