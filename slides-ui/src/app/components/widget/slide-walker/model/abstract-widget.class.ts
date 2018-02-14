@@ -173,6 +173,12 @@ export class AbstractWidget implements WidgetInterface {
       style: "font-family: FontAwesome; font-size: 12; cursor: pointer",
       display: "none"
     });
+    // click handler
+    group.click((event) => {
+      if (this.onClick) {
+        this.onClick(this, { action: name, id: this.guid })
+      }
+    });
     this.selector.set(name, group);
     let circle = this.snap.circle(0, 0, 10).attr({
       fill: "red",
@@ -186,8 +192,8 @@ export class AbstractWidget implements WidgetInterface {
       display: ""
     });
     text.attr({
-      x: -text.getBBox().w/2,
-      y: text.getBBox().h/5,
+      x: -text.getBBox().w / 2,
+      y: text.getBBox().h / 5,
     })
     group.add(text);
     // widget this selector
@@ -233,15 +239,7 @@ export class AbstractWidget implements WidgetInterface {
         }
       });
 
-    // click callback
-    this.selector.forEach((value: any, key: string) => {
-      value.click((event) => {
-        if (this.onClick) {
-          this.onClick(this, {action: key, id: this.guid})
-        }
-      });
-    });
-
+    // update element view
     this.elements.push(this.widget);
 
     // hover callback when mouse is over the
@@ -261,7 +259,7 @@ export class AbstractWidget implements WidgetInterface {
           value.attr({
             display: ""
           });
-          index ++;
+          index++;
         });
       },
       () => {
@@ -360,7 +358,7 @@ export class AbstractWidget implements WidgetInterface {
       if (direction.getNS() === 'S') {
         connector.setEnd(this.getBox().cx, this.getBox().y);
       } else {
-        connector.setEnd(this.getBox().cx, this.getBox().y +this.getBox().height);
+        connector.setEnd(this.getBox().cx, this.getBox().y + this.getBox().height);
       }
     })
     // for debug draw text information about position

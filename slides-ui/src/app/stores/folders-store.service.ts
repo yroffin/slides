@@ -47,6 +47,11 @@ export class FolderChildLink {
   folderElement: FolderElementBean;
 }
 
+export class SlideReferenceLink {
+  id: string;
+  reference: string;
+}
+
 /**
  * actions
  */
@@ -85,12 +90,22 @@ export class UpdateFolderAction implements ActionWithPayload<FolderBean> {
   constructor(public payload: FolderBean) { }
 }
 
+export class UpdateReferenceFolderAction implements ActionWithPayload<SlideReferenceLink> {
+  readonly type = 'UpdateReferenceFolderAction';
+  constructor(public payload: SlideReferenceLink) { }
+}
+
 export class SelectFolderAction implements ActionWithPayload<FolderBean> {
   readonly type = 'SelectFolderAction';
   constructor(public payload: FolderBean) { }
 }
 
-export type AllFoldersActions = LoadFoldersAction | AddFolderAction | DeleteFolderAction | SelectFolderAction | InsertFolderAction | UpdateFolderAction | AppendChildFolderAction | InsertChildFolderAction;
+export class RefreshFolderAction implements ActionWithPayload<FolderBean> {
+  readonly type = 'RefreshFolderAction';
+  constructor(public payload: FolderBean) { }
+}
+
+export type AllFoldersActions = LoadFoldersAction | AddFolderAction | DeleteFolderAction | SelectFolderAction | InsertFolderAction | UpdateFolderAction | AppendChildFolderAction | InsertChildFolderAction | RefreshFolderAction | UpdateReferenceFolderAction;
 
 /**
  * main store for this application
@@ -263,6 +278,39 @@ export class FoldersStoreService {
           return {
             folders: state.folders,
             folder: action.payload
+          };
+        }
+
+      /**
+       * message incomming
+       */
+      case 'RefreshFolderAction':
+        {
+          return {
+            folders: state.folders,
+            folder: state.folder
+          };
+        }
+
+      /**
+       * message incomming
+       */
+      case 'UpdateReferenceFolderAction':
+        {
+          let folder: FolderBean;
+          let folders = Object.assign([], state.folders);
+          _.each(folders, (element: FolderBean) => {
+            _.each(element.children, (child: FolderElementBean) => {
+              if (child.id === action.payload.id) {
+                folder = Object.assign({}, element);;
+                child.reference = action.payload.reference;
+              }
+            });
+          });
+
+          return {
+            folders: folders,
+            folder: folder
           };
         }
 

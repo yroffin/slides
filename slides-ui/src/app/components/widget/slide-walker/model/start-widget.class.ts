@@ -69,7 +69,6 @@ export class StartWidget extends AbstractWidget {
     box.height = 50;
     box.cx = box.x + box.width / 2;
     box.cy = box.y + box.height / 2;
-    console.log('log', box)
     return box;
   }
 }

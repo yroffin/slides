@@ -59,6 +59,8 @@ export class SlideWidget extends AbstractWidget {
   protected init() {
     super.init();
 
+    this.addSelector("update-reference", '\uf044');
+
     // rect area
     this.rect = this.snap.rect(0, 0, 100, 100).attr({
       fill: "#bada55",

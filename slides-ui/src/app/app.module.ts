@@ -111,7 +111,7 @@ import { CustomRouteReuseStrategyService } from './services/custom-route-reuse-s
  */
 const appRoutes: Routes = [
   { path: 'slide', component: SlideBrowserComponent, canActivate: [ProfileGuard] },
-  { path: 'sections', component: SlideWalkerComponent, canActivate: [ProfileGuard] },
+  { path: 'folders', component: SlideWalkerComponent, canActivate: [ProfileGuard] },
   { path: '', component: HomeComponent, canActivate: [ProfileGuard] },
   { path: '**', component: HomeComponent, canActivate: [ProfileGuard] }
 ];

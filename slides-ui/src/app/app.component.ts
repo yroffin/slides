@@ -221,16 +221,11 @@ export class AppComponent {
           this.right = true;
         }
       },
-      { label: 'Sections', icon: 'fa-sitemap', routerLink: ['/sections'] },
-      { label: 'Slide', icon: 'fa-sticky-note-o', routerLink: ['/slide'] },
-      {
-        label: 'Preview', icon: 'fa-newspaper-o', command: (event) => {
-          this.onOpenDocument();
-        }
-      },
+      { label: 'Folders', icon: 'fa-sitemap', routerLink: ['/folders'] },
+      { label: 'Slide', icon: 'fa-sticky-note-o', routerLink: ['/slide'] }
     ];
     this.items = [
-      { label: 'Browse', icon: 'fa-tasks', routerLink: ['/sections'] },
+      { label: 'Browse', icon: 'fa-tasks', routerLink: ['/folders'] },
       { label: 'Browse', icon: 'fa-eye', routerLink: ['/slide'] },
       {
         label: 'Calendar', icon: 'fa-calendar', command: (event) => {

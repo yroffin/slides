@@ -39,7 +39,7 @@ import { ConnectorWidget } from './model/connector-widget.class';
 import { SlideWidget } from './model/slide-widget.class';
 import { SlideEntry } from './model/slide-entry.class';
 import { SlidesStoreService } from '../../../stores/slides-store.service';
-import { FoldersStoreService, LoadFoldersAction, AddFolderAction, DeleteFolderAction, InsertFolderAction, UpdateFolderAction, AppendChildFolderAction } from '../../../stores/folders-store.service';
+import { FoldersStoreService, LoadFoldersAction, AddFolderAction, DeleteFolderAction, InsertFolderAction, UpdateFolderAction, AppendChildFolderAction, SelectFolderAction, UpdateReferenceFolderAction } from '../../../stores/folders-store.service';
 import { StartWidget } from './model/start-widget.class';
 import { WidgetInterface, AbstractWidget, WidgetAction } from './model/abstract-widget.class';
 import { DataFoldersService } from '../../../services/data-folders.service';
@@ -147,10 +147,14 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
    * ngInit handler
    */
   ngOnInit() {
+    // build snap area
     this.snap = Snap("#svg").attr({
       viewBox: "0 0 800 600",
       style: 'stroke-width: 5px; background-color: grey;'
     });
+
+    // update folder
+    this.reload(this.folder);
 
     // fix desk drag and move handler
     this.dragAndMove();
@@ -282,7 +286,9 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
    * @param folder 
    */
   private reload(folder: FolderBean) {
-    if (!this.snap) return;
+    if (!this.snap) {
+      return;
+    }
 
     this.snap.clear();
     this.widgets.clear();
@@ -408,6 +414,11 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
               children: new Array<FolderElementBean>()
             };
             this.foldersStoreService.dispatch(new AppendChildFolderAction({ id: link.id, folder: this.folder, folderElement: folderElement }));
+          });
+        }
+        if (link.action === "update-reference") {
+          this.selectSlide((slide: SlideBean) => {
+            this.foldersStoreService.dispatch(new UpdateReferenceFolderAction({ id: link.id, reference: slide.id }));
           });
         }
       });

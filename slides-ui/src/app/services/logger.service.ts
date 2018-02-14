@@ -30,6 +30,10 @@ export class LoggerService {
     console.info(message, args);
   }
 
+  public warn(message, ...args) {
+    console.warn(message, args);
+  }
+
   public error(message, ...args) {
     console.error(message, args);
   }
