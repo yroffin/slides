@@ -16,6 +16,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import * as _ from 'lodash';
+declare var Prism: any;
 import { DataSlidesService } from '../../../services/data-slides.service';
 import { LoggerService } from '../../../services/logger.service';
 import { SlideBean } from '../../../models/common/slide-bean';
@@ -23,6 +24,9 @@ import { Observable } from 'rxjs/Observable';
 import { SlidesStoreService, AddSlidesAction, DeleteSlidesAction, SelectSlideAction } from '../../../stores/slides-store.service';
 import { Store } from '@ngrx/store/src/store';
 import { FoldersStoreService } from '../../../stores/folders-store.service';
+import { ViewChild } from '@angular/core';
+import { ElementRef } from '@angular/core';
+import { SelectItem } from 'primeng/primeng';
 
 @Component({
   selector: 'app-slide-browser',
@@ -38,6 +42,15 @@ export class SlideBrowserComponent implements OnInit {
   protected slides: SlideBean[]
   protected slideStream: Store<SlideBean>;
   protected slide: SlideBean
+  protected htmlArea: string
+  protected svgArea: string
+  protected types: SelectItem[]
+
+  /**
+   * for svg render
+   */
+  @ViewChild('htmlrenderer') private htmlrenderer: ElementRef;
+  @ViewChild('svgrenderer') private svgrenderer: ElementRef;
 
   /**
    * constructor
@@ -53,6 +66,13 @@ export class SlideBrowserComponent implements OnInit {
     private dataSlidesService: DataSlidesService,
     private logger: LoggerService
   ) {
+    //SelectItem API with label-value pairs
+    this.types = [
+      { label: 'Select slide type', value: null },
+      { label: 'Html script', value: 'html' },
+      { label: 'Svg canvas', value: 'svg' }
+    ];
+
     /**
      * subscribe
      */
@@ -77,6 +97,8 @@ export class SlideBrowserComponent implements OnInit {
     this.slideStream.subscribe(
       (element: SlideBean) => {
         this.slide = element;
+        this.htmlArea = this.slide.body
+        this.svgArea = this.slide.body
       },
       error => {
         console.error(error);
@@ -172,6 +194,7 @@ export class SlideBrowserComponent implements OnInit {
    */
   protected onSave() {
     let updated: SlideBean
+    this.slide.body = this.svgArea
     this.dataSlidesService.Update(this.slide.id, this.slide)
       .subscribe(
       (data: SlideBean) => updated = data,
@@ -217,4 +240,25 @@ export class SlideBrowserComponent implements OnInit {
     ));
   }
 
+  /**
+   * pretty
+   */
+  private prettyhtml(body) {
+    if (body && this.htmlrenderer) {
+      this.htmlrenderer.nativeElement.innerHTML = body;
+      return Prism.highlight(body, Prism.languages.html);
+    }
+    return '';
+  }
+
+  /**
+   * pretty
+   */
+  private prettySvg(body) {
+    if (body && this.svgrenderer) {
+      this.svgrenderer.nativeElement.innerHTML = body;
+      return Prism.highlight(body, Prism.languages.html);
+    }
+    return '';
+  }
 }

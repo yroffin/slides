@@ -1,13 +1,15 @@
 <p-toolbar>
-    <div class="ui-toolbar-group-left">
-        <button pButton type="button" icon="fa-plus" (click)="onCreate($event)"></button>
-        <button pButton type="button" icon="fa-copy" (click)="onDuplicate($event)"></button>
-        <button pButton type="button" icon="fa-trash" (click)="onDelete($event)"></button>
-        <i class="fa fa-bars"></i>
-        <button pButton type="button" icon="fa-save" (click)="onSave()"></button>
-        <button pButton type="button" icon="fa-chevron-left" (click)="onPrev()"></button>
-        <button pButton type="button" icon="fa-chevron-right" (click)="onNext()"></button>
-    </div>
+  <div class="ui-toolbar-group-left">
+    <button pButton type="button" icon="fa-plus" (click)="onCreate($event)"></button>
+    <button pButton type="button" icon="fa-copy" (click)="onDuplicate($event)"></button>
+    <button pButton type="button" icon="fa-trash" (click)="onDelete($event)"></button>
+    <i class="fa fa-bars"></i>
+    <button pButton type="button" icon="fa-save" (click)="onSave()"></button>
+    <button pButton type="button" icon="fa-chevron-left" (click)="onPrev()"></button>
+    <button pButton type="button" icon="fa-chevron-right" (click)="onNext()"></button>
+    <i class="fa fa-bars"></i>
+    <p-dropdown [options]="types" [(ngModel)]="slide.type"></p-dropdown>
+  </div>
 </p-toolbar>
 <div *ngIf="slide" class="ui-g ui-fluid">
   <div class="ui-g-12 ui-sm-12">
@@ -35,7 +37,35 @@
       </span>
       <input type="text" [(ngModel)]="slide.name" pInputText placeholder="Title">
     </div>
-    <p-editor [(ngModel)]="slide.body" toolba="true" [style]="{'height':'100%', 'width':'100%'}">
-    </p-editor>
+
+    <span [hidden]="!(slide.type === '' || slide.type === 'html')">
+      <p-tabView>
+        <p-tabPanel header="Editor">
+          <p-editor [(ngModel)]="htmlArea" toolbar="true" [style]="{'height':'100%', 'width':'100%'}">
+          </p-editor>
+        </p-tabPanel>
+        <p-tabPanel header="Preview">
+          <div #htmlrenderer></div>
+        </p-tabPanel>
+        <p-tabPanel header="Html">
+          <pre><code [innerHtml]="prettyhtml(htmlArea)"></code></pre>
+        </p-tabPanel>
+      </p-tabView>
+    </span>
+
+    <div [hidden]="!(slide.type === 'svg')" class="ui-g ui-fluid">
+      <p-tabView>
+        <p-tabPanel header="Editor">
+          <textarea [rows]="24" [cols]="100" pInputTextarea autoResize="autoResize" [(ngModel)]="svgArea"></textarea>
+        </p-tabPanel>
+        <p-tabPanel header="Preview">
+          <div #svgrenderer></div>
+        </p-tabPanel>
+        <p-tabPanel header="Svg">
+          <pre><code [innerHtml]="prettySvg(svgArea)"></code></pre>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+
   </div>
 </div>

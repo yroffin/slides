@@ -20,6 +20,7 @@ export class SlideBean extends EntityBean {
     name: string
     title: string
     subtitle: string
+    type: string
     body: string
     order: string
     slides: Array<SlideBean>
