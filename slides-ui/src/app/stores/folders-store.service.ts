@@ -305,6 +305,12 @@ export class FoldersStoreService {
                 folder = Object.assign({}, element);;
                 child.reference = action.payload.reference;
               }
+              _.each(child.children, (child: FolderElementBean) => {
+                if (child.id === action.payload.id) {
+                  folder = Object.assign({}, element);;
+                  child.reference = action.payload.reference;
+                }
+              });
             });
           });
 

@@ -21,12 +21,17 @@ declare var mina: any;
 import * as _ from 'lodash';
 import { ConnectorWidget } from './connector-widget.class';
 import { AbstractWidget, WidgetInterface, WidgetAction, WidgetBox } from './abstract-widget.class';
+import { SlideBean } from '../../../../models/common/slide-bean';
+import { DataSlidesService } from '../../../../services/data-slides.service';
 
 export class SlideWidget extends AbstractWidget {
 
   private target: string;
   private rect: any;
   private text: any;
+  private name: any;
+
+  private slide: SlideBean;
 
   /**
    * constructor
@@ -36,12 +41,23 @@ export class SlideWidget extends AbstractWidget {
    * @param label 
    * @param callback 
    */
-  constructor(guid: string, target: string, s: any, label: string, callback: (widget: WidgetInterface, action: WidgetAction) => void) {
+  constructor(guid: string, target: string, s: any, label: string, dataSlidesService: DataSlidesService, callback: (widget: WidgetInterface, action: WidgetAction) => void) {
     super(guid, s, label, callback);
     this.target = target;
+    dataSlidesService.GetSingle(target).subscribe(
+      (data: SlideBean) => {
+        this.slide = Object.assign({}, data);
+        this.name.attr({text: "name: " + this.slide.name});
+      },
+      (error) => {
+        console.error(error);
+      }
+    )
     this.init();
     // on click callback
     this.onClick = callback;
+
+    this.isDebug = false;
   }
 
   /**
@@ -69,16 +85,20 @@ export class SlideWidget extends AbstractWidget {
     });
 
     // text area
-    this.text = this.snap.text(10, 10, this.guid).attr({
+    this.text = this.snap.text(10, 10, "id: " + this.guid).attr({
       fontSize: 8
     });
     let alt = this.snap.text(10, 20, "reference: " + this.label).attr({
+      fontSize: 8
+    });
+    this.name = this.snap.text(10, 30, "name: " + "").attr({
       fontSize: 8
     });
 
     this.widget.prepend(this.rect)
     this.widget.append(this.text);
     this.widget.append(alt);
+    this.widget.append(this.name);
     this.anchor(this.rect);
     return this.widget;
   }

@@ -77,12 +77,16 @@ export class ConnectorWidget extends AbstractWidget {
     });
     this.end = this.snap.group(circle);
     this.register(this.end);
+
+    this.isDebug = false;
   }
 
   /**
    * refresh debug information
    */
   protected refreshDebug() {
+    if (!this.isDebug) return;
+
     // start
     if (this.startDebug) this.startDebug.remove();
     this.startDebug = this.snap.text(10, -20, this.direction().getLabel()).attr({

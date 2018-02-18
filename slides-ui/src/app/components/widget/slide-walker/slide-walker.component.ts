@@ -395,7 +395,7 @@ export class SlideWalkerComponent implements OnInit, OnDestroy {
       if (!folderElement.id || folderElement.id === "") {
         folderElement.id = this.newGuid();
       }
-      let widget = new SlideWidget(folderElement.id, folderElement.reference, this.snap, folderElement.reference, (widget: WidgetInterface, link: WidgetAction) => {
+      let widget = new SlideWidget(folderElement.id, folderElement.reference, this.snap, folderElement.reference, this.dataSlidesService, (widget: WidgetInterface, link: WidgetAction) => {
         if (link.action === "add") {
           this.selectSlide((slide: SlideBean) => {
             let folderElement: FolderElementBean = {

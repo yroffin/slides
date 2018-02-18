@@ -66,9 +66,11 @@ export class AbstractWidget implements WidgetInterface {
   protected snap: any;
   protected guid: string;
   protected label: string;
+  
   private elements: any[] = new Array<any>();
   public static canDrag: boolean = true;
 
+  protected isDebug: boolean = true;
   private debug: any;
 
   // start and end connector
@@ -313,6 +315,8 @@ export class AbstractWidget implements WidgetInterface {
    * display debug information
    */
   protected refreshDebug() {
+    if(!this.isDebug) return;
+
     let debug = this.getBox().x + " x " + this.getBox().y + " * tx " + this.widget.transform();
     if (this.debug) this.debug.remove();
     this.debug = this.snap.text(10, 90, debug).attr({
